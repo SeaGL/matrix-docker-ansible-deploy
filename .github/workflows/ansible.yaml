@@ -3,7 +3,7 @@ name: Run Ansible playbook
 on:
   push:
     branches:
-      - main
+      - seagl-fork
   pull_request:
   workflow_dispatch:
 
