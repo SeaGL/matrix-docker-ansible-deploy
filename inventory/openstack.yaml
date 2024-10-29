@@ -1,0 +1,10 @@
+plugin: generator
+
+strict: true
+
+hosts:
+  name: "{{ now(fmt='%Y') }}-ephemeral.host.seagl.org"
+  parents:
+    - name: matrix_servers
+
+layers: {}
