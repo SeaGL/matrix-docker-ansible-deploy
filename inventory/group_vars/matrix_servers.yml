@@ -11,6 +11,7 @@
 # Example value: example.com
 matrix_domain: "{{ now(fmt='%Y') }}.seagl.org"
 matrix_static_files_file_matrix_support_enabled: true
+matrix_static_files_container_labels_base_domain_enabled: true
 
 matrix_server_fqn_matrix: "{{ now(fmt='%Y') }}-ephemeral.host.seagl.org"
 
