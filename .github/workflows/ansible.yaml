@@ -1,0 +1,79 @@
+name: Run Ansible playbook
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  run_ansible:
+    name: Run Ansible playbook
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout Repo
+      uses: actions/checkout@v1
+
+    - name: Install Ansible dependencies
+      id: init
+      run: ansible-galaxy install -r requirements.yml -p roles/galaxy/'
+
+    - name: Configure SSH key
+      run: 'mkdir -p ~/.ssh && echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519 && echo "$SSH_PUBLIC_KEY" > ~/.ssh/id_ed25519.pub && chmod 600 ~/.ssh/id_ed25519'
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
+
+    - name: Configure SSH known_hosts
+      run: 'echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts'
+      env:
+        SSH_KNOWN_HOSTS: ${{ vars.SSH_KNOWN_HOSTS }}
+
+    # TODO linting/syntax checking
+
+    - name: Run Ansible in check mode
+      # Why. WHY. WHY is it so hard to get output in GitHub Actions.
+      # GitHub. Come on. Come ON. WHO WOULD DO THIS. WHO WOULD DO THIS I ASK YOU PLEASE
+      uses: mathiasvr/command-output@v2.0.0
+      id: check
+      if: github.event_name == 'pull_request'
+      with:
+        run: ansible-playbook -i inventory/ --vault-password-file .github/get_vault_password.sh -u gh-actions -C --tags=install-all,ensure-matrix-users-created,start setup.yml 2>&1
+      env:
+        ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+
+    - name: Update Pull Request
+      uses: actions/github-script@v6
+      if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+      env:
+        CHECK: "${{ steps.check.outputs.stdout }}"
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const output = `#### Ansible dep install \`${{ steps.init.outcome }}\`
+          #### Ansible check mode \`${{ steps.check.outcome }}\`
+
+          <details><summary>Show check mode</summary>
+
+          \`\`\`\n
+          ${process.env.CHECK}
+          \`\`\`
+
+          </details>
+
+          *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: output
+          })
+
+    - name: Ansible play
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: ansible-playbook -i inventory/ --vault-password-file .github/get_vault_password.sh -u gh-actions --tags=install-all,ensure-matrix-users-created,start setup.yml 2>&1
+      env:
+        ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
