@@ -73,7 +73,7 @@ jobs:
           })
 
     - name: Ansible play
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      if: github.ref == 'refs/heads/seagl-fork' && github.event_name == 'push'
       run: ansible-playbook -i inventory/ --vault-password-file .github/get_vault_password.sh -u gh-actions --tags=install-all,ensure-matrix-users-created,start setup.yml 2>&1
       env:
         ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
