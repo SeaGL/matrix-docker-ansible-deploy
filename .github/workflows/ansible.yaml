@@ -1,6 +1,6 @@
 name: Run Ansible playbook
 
-on:
+on:  # yamllint disable-line rule:truthy
   push:
     branches:
       - seagl-fork
