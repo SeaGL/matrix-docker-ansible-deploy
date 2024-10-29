@@ -16,6 +16,9 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v1
 
+    - name: Install passlib
+      run: pipx inject ansible-core passlib
+
     - name: Install Ansible dependencies
       id: init
       run: ansible-galaxy install -r requirements.yml -p roles/galaxy/
