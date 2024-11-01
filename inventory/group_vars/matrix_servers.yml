@@ -90,5 +90,5 @@ postgres_connection_password: !vault |
 # Audit user registrations
 matrix_synapse_ext_audit_registrations_enabled: true
 matrix_synapse_ext_audit_registrations_config:
-  room_alias: "#triage:seagl.org"
+  room_alias: "#audit:{{ now(fmt='%Y') }}.seagl.org"
   user_id: "@notifications:{{ now(fmt='%Y') }}.seagl.org"
