@@ -86,3 +86,9 @@ postgres_connection_password: !vault |
 # Example: `matrix_coturn_turn_external_ip_addresses: ['1.2.3.4', '4.5.6.7']`
 #
 # matrix_coturn_turn_external_ip_address: ''
+
+# Audit user registrations
+matrix_synapse_ext_audit_registrations_enabled: true
+matrix_synapse_ext_audit_registrations_config:
+  room_alias: "#triage:seagl.org"
+  user_id: "@notifications:{{ now(fmt='%Y') }}.seagl.org"

@@ -82,3 +82,13 @@
   block:
     - when: matrix_synapse_ext_synapse_auto_accept_invite_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/ext/synapse-auto-accept-invite/setup_install.yml"
+
+# audit-registrations
+- tags:
+    - setup-all
+    - setup-synapse
+    - install-all
+    - install-synapse
+  block:
+    - when: matrix_synapse_ext_audit_registrations_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/ext/audit-registrations/setup_install.yml"
