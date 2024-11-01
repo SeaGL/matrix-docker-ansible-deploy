@@ -1342,6 +1342,9 @@ matrix_synapse_ext_synapse_auto_accept_invite_worker_to_run_on: null
 # If it is, the Synapse media repo and media-repo workers will be disabled automatically.
 matrix_synapse_ext_media_repo_enabled: false
 
+# Auditing of user registrations
+matrix_synapse_ext_audit_registrations_enabled: false
+
 matrix_s3_media_store_enabled: false
 matrix_s3_media_store_custom_endpoint_enabled: false
 matrix_s3_goofys_docker_image: "{{ matrix_s3_goofys_docker_image_name_prefix }}ewoutp/goofys:latest"
