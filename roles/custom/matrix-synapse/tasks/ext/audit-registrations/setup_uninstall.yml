@@ -1,0 +1,6 @@
+---
+
+- name: Uninstall audit registrations module
+  ansible.builtin.file:
+    path: "{{ matrix_synapse_ext_path }}/audit_registrations.py"
+    state: absent
