@@ -5,10 +5,10 @@ This is a "fork" of [spantaleev/matrix-docker-ansible-deploy](https://github.com
 ## To set up an ephemeral homeserver
 
 1. Instantiate the [`ephemeral_homeserver` Terraform module](https://github.com/SeaGL/seagl-terraform/tree/8c8ae33c26c070b4d8fa29f099bd5bada79f84bd/ephemeral_homeserver) for this year
-2. Add the new instance's SSH key to [this GitHub Actions variable](https://github.com/SeaGL/seagl-ansible/settings/variables/actions/SSH_KNOWN_HOSTS)
+2. Add the new instance's SSH key to [this GitHub Actions variable](https://github.com/SeaGL/seagl-ansible/settings/variables/actions/SSH_KNOWN_HOSTS) and [this second variable](https://github.com/SeaGL/matrix-docker-ansible-deploy/settings/variables/actions/SSH_KNOWN_HOSTS)
 3. Add the new instance to Ansible's inventory. Make sure the inventory group is called `ephemeral`.
-4. Push the inventory update, in order to run the regular Ansible playbooks against it (you need GitHub Actions to bootstrap everyone else into the instance).
-5. Update this repo (see below).
+4. Push the inventory update, in order to run the regular Ansible playbooks against it (you need GitHub Actions to bootstrap everyone else into the instance)
+5. Update this repo (see below)
 6. Push this repository. GitHub Actions will configure the homeserver automatically.
 
 ## To run locally
