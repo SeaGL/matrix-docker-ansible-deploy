@@ -10,6 +10,8 @@ This is a "fork" of [spantaleev/matrix-docker-ansible-deploy](https://github.com
 4. Push the inventory update, in order to run the regular Ansible playbooks against it (you need GitHub Actions to bootstrap everyone else into the instance)
 5. Update this repo (see below)
 6. Push this repository. GitHub Actions will configure the homeserver automatically.
+7. If the GitHub Actions run fails, rerun it. This is necessary on initial setup due to ordering/timing issues.
+8. Run the homeserver through [Matrix Federation Tester](https://federationtester.matrix.org/), just to be sure.
 
 ## To run locally
 
