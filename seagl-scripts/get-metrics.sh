@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-elimination_set="('@aj-test2:$(date +%Y).seagl.org', '@test-1:$(date +%Y).seagl.org')"
+elimination_set="('@aj-test2:$(date +%Y).seagl.org', '@test-1:$(date +%Y).seagl.org', '@polygonart6667:$(date +%Y).seagl.org')"
 
 function prompt_continue() {
 	read -n 1 -s -r -p 'Press any key to continue... '
