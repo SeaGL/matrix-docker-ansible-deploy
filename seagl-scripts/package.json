@@ -1,0 +1,15 @@
+{
+  "name": "seagl-scripts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "AJ Jordan <alex@strugee.net>",
+  "license": "LGPL-3.0+",
+  "private": true,
+  "dependencies": {
+    "ua-parser-js": "^2.0.6"
+  }
+}
