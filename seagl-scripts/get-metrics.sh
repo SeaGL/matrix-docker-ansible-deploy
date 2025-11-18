@@ -35,4 +35,7 @@ echo
 echo 'Ephemeral homeserver device registration count, excluding staff:'
 remote_psql "$with_nonstaff_clause SELECT count AS \\\"Number of devices registered\\\", COUNT(count) AS \\\"Users in population\\\" FROM (SELECT user_id, COUNT(user_id) FROM devices INNER JOIN non_staff_users ON non_staff_users.name = devices.user_id WHERE display_name != 'master signing key' AND display_name != 'self_signing signing key' AND display_name != 'user_signing signing key' GROUP BY user_id) GROUP BY count;"
 
+echo 'Ephemeral homeserver device registration User-Agents, excluding staff:'
+echo '| Count | Browser:Platform |'
+echo '| ----- | ---------------- |'
 remote_psql "$with_nonstaff_clause SELECT user_agent FROM devices INNER JOIN non_staff_users ON non_staff_users.name = devices.user_id WHERE display_name != 'master signing key' AND display_name != 'self_signing signing key' AND display_name != 'user_signing signing key';" -t | grep -Ev '\([[:digit:]]+ rows\)' | node $(dirname $BASH_SOURCE)/process-uas.js | sort | uniq -c | sort -rh | sed 's/^[[:space:]]*//' | column -t -s' ' --table-columns-limit 2 -o ' | '
