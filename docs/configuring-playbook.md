@@ -53,6 +53,8 @@ For a more custom setup, see the [Other configuration options](#other-configurat
 
   - [Configuring continuwuity](configuring-playbook-continuwuity.md), if you've switched to the [continuwuity](https://continuwuity.org) homeserver implementation
 
+  - [Configuring Tuwunel](configuring-playbook-tuwunel.md), if you've switched to the [Tuwunel](https://matrix-construct.github.io/tuwunel/) homeserver implementation
+
   - [Configuring Dendrite](configuring-playbook-dendrite.md), if you've switched to the [Dendrite](https://matrix-org.github.io/dendrite) homeserver implementation
 
 - Server components:
@@ -181,6 +183,8 @@ Bridges can be used to connect your Matrix installation with third-party communi
 - [Setting up Matrix SMS bridging](configuring-playbook-bridge-matrix-bridge-sms.md)
 
 - [Setting up Heisenbridge bouncer-style IRC bridging](configuring-playbook-bridge-heisenbridge.md)
+
+- [Setting up a Matrix <-> Meshtastic bridge](configuring-playbook-bridge-meshtastic-relay.md)
 
 - [Setting up WeChat bridging](configuring-playbook-bridge-wechat.md)
 

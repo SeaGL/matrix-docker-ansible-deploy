@@ -1,4 +1,25 @@
+# 2026-05-07
+
+## Tuwunel support
+
+Thanks to [Jason Volk](https://github.com/jevolk), the playbook now supports the [Tuwunel](./docs/configuring-playbook-tuwunel.md) homeserver as an optional alternative to Synapse.
+
+Tuwunel is a fork of [conduwuit](./docs/configuring-playbook-conduwuit.md) written in Rust. Like [Continuwuity](./docs/configuring-playbook-continuwuity.md), it continues development on top of conduwuit's database format.
+
+Existing installations do **not** need to be updated. **Synapse is still the default homeserver implementation** installed by the playbook.
+
+People that used to run conduwuit may wish to [migrate from conduwuit to Tuwunel](./docs/configuring-playbook-tuwunel.md#migrating-from-conduwuit) via the new `tuwunel-migrate-from-conduwuit` tag, which performs an in-place binary-swap migration that reads the conduwuit database directly.
+
+**The homeserver implementation of an existing server cannot be changed** (e.g. from Synapse/Conduit/Dendrite/Continuwuity to Tuwunel) without data loss. The exception is conduwuit, due to the shared database format.
+
+
 # 2026-04-24
+
+## Support for bridging to Meshtastic via meshtastic-matrix-relay
+
+Thanks to [luschmar](https://github.com/luschmar), the playbook now supports bridging to [Meshtastic](https://meshtastic.org/) mesh networks via [meshtastic-matrix-relay](https://github.com/jeremiah-k/meshtastic-matrix-relay) (mmrelay).
+
+To learn more, see our [Setting up a Matrix <-> Meshtastic bridge](./docs/configuring-playbook-bridge-meshtastic-relay.md) documentation page.
 
 ## (BC Break) mautrix-telegram has been rewritten in Go (bridgev2)
 

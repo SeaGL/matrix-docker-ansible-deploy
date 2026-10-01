@@ -25,7 +25,6 @@ matrix_cactus_comments_client_container_image_registry_prefix: "{{ matrix_cactus
 matrix_cactus_comments_client_container_image_registry_prefix_upstream: "{{ matrix_cactus_comments_client_container_image_registry_prefix_upstream_default }}"
 matrix_cactus_comments_client_container_image_registry_prefix_upstream_default: docker.io/
 matrix_cactus_comments_client_container_image_tag: "{{ 'latest' if matrix_cactus_comments_client_version == 'latest' else (matrix_cactus_comments_client_version + '-alpine') }}"
-matrix_cactus_comments_client_container_image_force_pull: "{{ matrix_cactus_comments_client_container_image.endswith(':latest') }}"
 
 matrix_cactus_comments_client_container_network: ""
 
