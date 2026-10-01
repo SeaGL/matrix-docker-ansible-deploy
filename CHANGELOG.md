@@ -1,10 +1,16 @@
-# 2026-07-11
+# 2026-07-12
 
 ## matrix-registration-bot has been removed from the playbook
 
 The [matrix-registration-bot](./docs/configuring-playbook-bot-matrix-registration-bot.md) service has been removed from the playbook, as it has been unmaintained.
 
 The playbook will let you know if you're using any `matrix_bot_matrix_registration_bot_*` variables. You'll need to remove them from `vars.yml` and potentially [uninstall the component manually](./docs/configuring-playbook-bot-matrix-registration-bot.md#uninstalling-the-component-manually).
+
+## Continuwuity v26 no longer supports LDAP
+
+The playbook now installs [Continuwuity](./docs/configuring-playbook-continuwuity.md) v26, a major upgrade from the v0.5.x series which **removes LDAP authentication support** (see the [v26.6.0 release notes](https://forgejo.ellis.link/continuwuation/continuwuity/releases/tag/v26.6.0)).
+
+The playbook never exposed dedicated variables for Continuwuity's LDAP support, so most people are unaffected. However, if you had enabled LDAP via `matrix_continuwuity_environment_variables_extension` or a custom configuration template, you'll need to migrate to another authentication method, such as the newly introduced [OpenID Connect support](https://continuwuity.org/guides/oidc).
 
 # 2026-06-29
 

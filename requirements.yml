@@ -45,7 +45,7 @@
   version: v1.13.3-0
   name: livekit_server
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-ntfy.git
-  version: v2.25.0-0
+  version: v2.26.0-0
   name: ntfy
 - src: git+https://github.com/devture/com.devture.ansible.role.playbook_help.git
   version: ea8c5cc750c4e23d004c9a836dfd9eda82d45ff4
@@ -63,19 +63,19 @@
   version: v18-3
   name: postgres_backup
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-prometheus.git
-  version: v3.13.0-1
+  version: v3.13.1-0
   name: prometheus
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-prometheus-nginxlog-exporter.git
   version: v1.10.0-4
   name: prometheus_nginxlog_exporter
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-prometheus-node-exporter.git
-  version: v1.10.2-2
+  version: v1.12.0-0
   name: prometheus_node_exporter
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-prometheus-postgres-exporter.git
   version: v0.20.1-0
   name: prometheus_postgres_exporter
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-sable.git
-  version: v1.19.1-0
+  version: v1.19.3-0
   name: sable
 - src: git+https://github.com/devture/com.devture.ansible.role.systemd_docker_base.git
   version: v1.5.0-0
