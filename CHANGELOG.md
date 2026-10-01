@@ -1,4 +1,20 @@
+# 2026-07-11
+
+## matrix-registration-bot has been removed from the playbook
+
+The [matrix-registration-bot](./docs/configuring-playbook-bot-matrix-registration-bot.md) service has been removed from the playbook, as it has been unmaintained.
+
+The playbook will let you know if you're using any `matrix_bot_matrix_registration_bot_*` variables. You'll need to remove them from `vars.yml` and potentially [uninstall the component manually](./docs/configuring-playbook-bot-matrix-registration-bot.md#uninstalling-the-component-manually).
+
 # 2026-06-29
+
+## Support for running on Synology DSM
+
+Thanks to [cksit](https://github.com/cksit), the playbook can now run on [Synology DSM](https://www.synology.com/dsm) 7 and later.
+
+Synology hosts are detected automatically (via `/etc/synoinfo.conf`), so other systems are unaffected. On DSM, the playbook uses the platform's native user management (`synouser`/`synogroup`), works around a Docker SDK incompatibility, and installs a small boot-fix service that handles a few DSM-specific boot quirks.
+
+To get started, see the new [Configuring Synology DSM](./docs/configuring-playbook-synology.md) documentation page.
 
 ## Mautrix bridges now expose their API (for Mautrix Manager and similar tools)
 
