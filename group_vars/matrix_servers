@@ -238,12 +238,14 @@ matrix_addons_homeserver_systemd_services_list: "{{ ([traefik_identifier + '.ser
 #     (see `matrix_playbook_internal_matrix_client_api_traefik_entrypoint_enabled`)
 # - core services (the homeserver) get a level of ~1000
 # - services that the homeserver depends on (database, Redis, ntfy, coturn, etc.) get a lower level — between 500 and 1000
-# - coturn gets a higher level if `devture_systemd_service_manager_service_restart_mode == 'one-by-one'` to intentionally delay it, because:
+# - coturn gets a higher priority level (= starts later) if `devture_systemd_service_manager_service_restart_mode == 'one-by-one'` to intentionally delay it, because:
 #  - starting services one by one means that the service manager role waits for each service to fully start before proceeding to the next one
 #  - if coturn has a lower priority than the homeserver, it would be started before it
 #  - since coturn is started before the homeserver, there's no container label telling Traefik to get a `matrix.example.com` certificate
 #  - thus, coturn would spin and wait for a certificate until it fails. We'd get a playbook failure due to it, but service manager will proceed to start all other services anyway.
 #  - only later, when the homeserver actually starts, would that certificate be fetched and dumped
+#  - this is not a problem with `all-at-once` (default) or `priority-batched` (services start concurrently),
+#    or with `clean-stop-start` (everything stops first, then starts in priority order — coturn at 900 is fine)
 # - reverse-proxying services get level 3000
 # - Matrix utility services (bridges, bots) get a level of 2000/2200, so that:
 #   - they can start before the reverse-proxy
@@ -352,7 +354,7 @@ devture_systemd_service_manager_services_list_auto: |
     +
     ([{'name': 'matrix-corporal.service', 'priority': 1500, 'groups': ['matrix', 'corporal']}] if matrix_corporal_enabled else [])
     +
-    ([{'name': 'matrix-coturn.service', 'priority': (900 if devture_systemd_service_manager_service_restart_mode == 'clean-stop-start' else 1500), 'groups': ['matrix', 'coturn']}] if matrix_coturn_enabled else [])
+    ([{'name': 'matrix-coturn.service', 'priority': (1500 if devture_systemd_service_manager_service_restart_mode == 'one-by-one' else 900), 'groups': ['matrix', 'coturn']}] if matrix_coturn_enabled else [])
     +
     ([{'name': 'matrix-matrixto.service', 'priority': 4000, 'groups': ['matrix', 'matrixto']}] if matrix_matrixto_enabled else [])
     +
@@ -517,7 +519,6 @@ matrix_homeserver_container_client_api_endpoint: |-
       'synapse': ('matrix-synapse-reverse-proxy-companion:8008' if matrix_synapse_reverse_proxy_companion_enabled | default(false) else ('matrix-synapse:'+ matrix_synapse_container_client_api_port | default('8008') | string)),
       'dendrite': ('matrix-dendrite:' + matrix_dendrite_http_bind_port | default('8008') | string),
       'conduit': ('matrix-conduit:' + matrix_conduit_port_number | default('8008') | string),
-      'conduwuit': ('matrix-conduwuit:' + matrix_conduwuit_config_port_number | default('8008') | string),
       'continuwuity': ('matrix-continuwuity:' + matrix_continuwuity_config_port_number | default('8008') | string),
     }[matrix_homeserver_implementation]
   }}
@@ -528,7 +529,6 @@ matrix_homeserver_container_federation_api_endpoint: |-
       'synapse': ('matrix-synapse-reverse-proxy-companion:8048' if matrix_synapse_reverse_proxy_companion_enabled else ('matrix-synapse:'+ matrix_synapse_container_federation_api_plain_port | default('8008') | string)),
       'dendrite': ('matrix-dendrite:' + matrix_dendrite_http_bind_port | default('8008') | string),
       'conduit': ('matrix-conduit:' + matrix_conduit_port_number | default('8008') | string),
-      'conduwuit': ('matrix-conduwuit:' + matrix_conduwuit_config_port_number | default('8008') | string),
       'continuwuity': ('matrix-continuwuity:' + matrix_continuwuity_config_port_number | default('8008') | string),
     }[matrix_homeserver_implementation]
   }}
@@ -3105,7 +3105,7 @@ matrix_coturn_container_image_self_build: "{{ matrix_architecture not in ['amd64
 
 # We make the assumption that `ansible_host` points to an external IP address, which may not always be the case.
 # Users are free to set `matrix_coturn_turn_external_ip_address` to an empty string
-# to allow auto-detection (via an EchoIP service) to happen at runtime.
+# to allow auto-detection (via an echoip service) to happen at runtime.
 matrix_coturn_turn_external_ip_address: "{{ ansible_host }}"
 
 matrix_coturn_turn_static_auth_secret: "{{ ((matrix_homeserver_generic_secret_key + ':coturn.sas') | hash('sha512') | to_uuid) if matrix_coturn_authentication_method == 'auth-secret' else '' }}"
@@ -5093,7 +5093,6 @@ grafana_default_home_dashboard_path: |-
       'synapse': ('/etc/grafana/dashboards/synapse.json' if matrix_synapse_metrics_enabled and matrix_synapse_metrics_enabled else ('/etc/grafana/dashboards/node-exporter-full.json' if prometheus_node_exporter_enabled else '')),
       'dendrite': ('/etc/grafana/dashboards/node-exporter-full.json' if prometheus_node_exporter_enabled else ''),
       'conduit': ('/etc/grafana/dashboards/node-exporter-full.json' if prometheus_node_exporter_enabled else ''),
-      'conduwuit': ('/etc/grafana/dashboards/node-exporter-full.json' if prometheus_node_exporter_enabled else ''),
       'continuwuity': ('/etc/grafana/dashboards/node-exporter-full.json' if prometheus_node_exporter_enabled else ''),
     }[matrix_homeserver_implementation]
   }}
@@ -5154,7 +5153,6 @@ matrix_registration_shared_secret: |-
       'synapse': matrix_synapse_registration_shared_secret | default (''),
       'dendrite': matrix_dendrite_client_api_registration_shared_secret | default (''),
       'conduit': '',
-      'conduwuit': '',
       'continuwuity': '',
     }[matrix_homeserver_implementation]
   }}
@@ -5310,58 +5308,6 @@ matrix_conduit_turn_password: "{{ matrix_coturn_lt_cred_mech_password if (matrix
 ######################################################################
 #
 # /matrix-conduit
-#
-######################################################################
-
-
-######################################################################
-#
-# matrix-conduwuit
-#
-######################################################################
-
-matrix_conduwuit_enabled: "{{ matrix_homeserver_implementation == 'conduwuit' }}"
-
-matrix_conduwuit_hostname: "{{ matrix_server_fqn_matrix }}"
-
-matrix_conduwuit_config_allow_federation: "{{ matrix_homeserver_federation_enabled }}"
-
-matrix_conduwuit_docker_image_registry_prefix_upstream: "{{ matrix_container_global_registry_prefix_override if matrix_container_global_registry_prefix_override else matrix_conduwuit_docker_image_registry_prefix_upstream_default }}"
-
-matrix_conduwuit_container_network: "{{ matrix_homeserver_container_network }}"
-
-matrix_conduwuit_container_additional_networks_auto: |
-  {{
-    (
-      ([matrix_playbook_reverse_proxyable_services_additional_network] if matrix_conduwuit_container_labels_traefik_enabled and matrix_playbook_reverse_proxyable_services_additional_network else [])
-    ) | unique
-  }}
-
-matrix_conduwuit_container_labels_traefik_enabled: "{{ matrix_playbook_reverse_proxy_type in ['playbook-managed-traefik', 'other-traefik-container'] and not matrix_synapse_workers_enabled }}"
-matrix_conduwuit_container_labels_traefik_docker_network: "{{ matrix_playbook_reverse_proxyable_services_additional_network }}"
-matrix_conduwuit_container_labels_traefik_entrypoints: "{{ traefik_entrypoint_primary }}"
-matrix_conduwuit_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
-
-matrix_conduwuit_container_labels_public_client_root_redirection_enabled: "{{ matrix_conduwuit_container_labels_public_client_root_redirection_url != '' }}"
-matrix_conduwuit_container_labels_public_client_root_redirection_url: "{{ (('https://' if matrix_playbook_ssl_enabled else 'http://') + matrix_server_fqn_element) if matrix_client_element_enabled else '' }}"
-
-matrix_conduwuit_container_labels_public_federation_api_traefik_hostname: "{{ matrix_server_fqn_matrix_federation }}"
-matrix_conduwuit_container_labels_public_federation_api_traefik_entrypoints: "{{ matrix_federation_traefik_entrypoint_name }}"
-matrix_conduwuit_container_labels_public_federation_api_traefik_tls: "{{ matrix_federation_traefik_entrypoint_tls }}"
-
-matrix_conduwuit_container_labels_internal_client_api_enabled: "{{ matrix_playbook_internal_matrix_client_api_traefik_entrypoint_enabled }}"
-matrix_conduwuit_container_labels_internal_client_api_traefik_entrypoints: "{{ matrix_playbook_internal_matrix_client_api_traefik_entrypoint_name }}"
-
-matrix_conduwuit_config_turn_uris: "{{ matrix_coturn_turn_uris if matrix_coturn_enabled else [] }}"
-matrix_conduwuit_config_turn_secret: "{{ matrix_coturn_turn_static_auth_secret if (matrix_coturn_enabled and matrix_coturn_authentication_method == 'auth-secret') else '' }}"
-matrix_conduwuit_config_turn_username: "{{ matrix_coturn_lt_cred_mech_username if (matrix_coturn_enabled and matrix_coturn_authentication_method == 'lt-cred-mech') else '' }}"
-matrix_conduwuit_config_turn_password: "{{ matrix_coturn_lt_cred_mech_password if (matrix_coturn_enabled and matrix_coturn_authentication_method == 'lt-cred-mech') else '' }}"
-
-matrix_conduwuit_self_check_validate_certificates: "{{ matrix_playbook_ssl_enabled }}"
-
-######################################################################
-#
-# /matrix-conduwuit
 #
 ######################################################################
 
