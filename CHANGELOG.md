@@ -1,4 +1,34 @@
+# 2026-02-13
+
+## Conditional service restart for `install-*` commands
+
+When running `install-all` or `install-service` (whether via `just` or raw `ansible-playbook`), only services whose configuration or container image actually changed during the playbook run will now be restarted. Unchanged services are left running (or get started if they were stopped). This reduces unnecessary downtime — particularly for services like Traefik (the reverse proxy), which previously caused brief connectivity interruptions on every playbook run even when nothing changed.
+
+When running with `setup-*` tags (e.g. `setup-all`, `setup-synapse`), all services continue to be unconditionally restarted as before.
+
+Currently, only Traefik tracks its own changes and benefits from conditional restart. All other services default to being restarted (the previous behavior). This is just the beginning — as more roles gain change-tracking support, playbook performance will improve and downtime will decrease dramatically, especially for `install-all` runs where most services haven't changed.
+
+Some benchmarks for `just install-service traefik` when Traefik settings did not change:
+
+- **Before**:
+  - total time: ~56 seconds 🐌
+  - Traefik restarted: yes (unnecessarily) ❌
+  - dependent services restarted: yes, all of them ❌
+- **After**:
+  - total time: ~27 seconds ⚡
+  - Traefik restarted: no ✅
+  - dependent services restarted: no ✅
+
+This behavior can be overridden via `--extra-vars='devture_systemd_service_manager_conditional_restart_enabled=false'` to force unconditional restarts. See [Conditional service restart](docs/just.md#conditional-service-restart) for details.
+
+
 # 2026-02-12
+
+## Dimension integration manager has been removed from the playbook
+
+The [Dimension integration manager](./docs/configuring-playbook-dimension.md) has been removed from the playbook, as it has been unmaintained.
+
+The playbook will let you know if you're using any `matrix_dimension_*` variables. You'll need to remove them from `vars.yml` and potentially [uninstall the component manually](./docs/configuring-playbook-dimension.md#uninstalling-the-component-manually).
 
 ## (BC Break) Hydrogen role has been relocated and variable names need adjustments
 
