@@ -7,7 +7,7 @@
 #
 # If you've deployed using the wrong domain, you'll have to run the Uninstalling step,
 # because you can't change the Domain after deployment.
-matrix_domain: "{{ now(fmt='%Y') }}.seagl.org"
+# matrix_domain: # Inherited from `openstack.yaml`
 
 # Enable serving a static site at the base domain.
 matrix_static_files_container_labels_base_domain_enabled: true
@@ -115,8 +115,8 @@ matrix_synapse_rc_joins:
 # Audit user registrations
 matrix_synapse_ext_audit_registrations_enabled: true
 matrix_synapse_ext_audit_registrations_config:
-  room_alias: "#audit:{{ now(fmt='%Y') }}.seagl.org"
-  user_id: "@notifications:{{ now(fmt='%Y') }}.seagl.org"
+  room_alias: "#audit:{{ matrix_domain }}"
+  user_id: "@notifications:{{ matrix_domain }}"
 
 # Metrics
 prometheus_enabled: true

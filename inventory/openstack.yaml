@@ -4,8 +4,11 @@ plugin: generator
 strict: true
 
 hosts:
-  name: "{{ now(fmt='%Y') }}-ephemeral.host.seagl.org"
+  name: ephemeral
   parents:
     - name: matrix_servers
+      vars:
+        ansible_host: "{{ now(fmt='%Y') }}-ephemeral.host.seagl.org"
+        matrix_domain: "{{ now(fmt='%Y') }}.seagl.org"
 
 layers: {}
