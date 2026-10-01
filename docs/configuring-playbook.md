@@ -89,7 +89,7 @@ Web clients for Matrix that you can host on your own domains.
 
 - [Setting up Cinny](configuring-playbook-client-cinny.md), if you've enabled [Cinny](https://github.com/ajbura/cinny), a web client focusing primarily on simple, elegant and secure interface
 
-- [Setting up Sable](configuring-playbook-client-sable.md), if you've enabled [Sable](https://github.com/7w1/sable), a web client focusing primarily on simple, elegant and secure interface
+- [Setting up Sable](configuring-playbook-client-sable.md), if you've enabled [Sable](https://github.com/SableClient/Sable), a web client focusing primarily on simple, elegant and secure interface
 
 - [Setting up SchildiChat Web](configuring-playbook-client-schildichat-web.md), if you've enabled [SchildiChat Web](https://schildi.chat/), a web client based on [Element Web](https://element.io/) with some extras and tweaks
 
@@ -157,6 +157,8 @@ Bridges can be used to connect your Matrix installation with third-party communi
 - [Setting up Mautrix Signal bridging](configuring-playbook-bridge-mautrix-signal.md)
 
 - [Setting up Mautrix wsproxy for bridging Android SMS or Apple iMessage](configuring-playbook-bridge-mautrix-wsproxy.md)
+
+- [Setting up RustPush (iMessage) bridging](configuring-playbook-bridge-rustpush.md)
 
 - [Setting up Appservice IRC bridging](configuring-playbook-bridge-appservice-irc.md)
 
