@@ -54,12 +54,10 @@
   ],
   "packageRules": [
     {
+      "description": "Roles use `vUPSTREAM-N` tags. `sourceUrl` is only known after lookup, so `matchSourceUrls` cannot select the versioning; match the datasource instead",
       "ignoreUnstable": false,
       "versioning": "loose",
-      "matchSourceUrls": [
-        "https://github.com/devture/com.devture.ansible.role{/,}**",
-        "https://github.com/mother-of-all-self-hosting{/,}**"
-      ]
+      "matchDatasources": ["git-tags"]
     },
     {
       "description": "mautrix images are dual-tagged (v0.YYMM.PATCH and vYY.MM[.PATCH]). Stick to the v0 scheme: it matches the git tags (needed for self-building) and has a consistent number of components (the calver tags do not, which makes Renovate stop offering updates).",
@@ -111,7 +109,7 @@
       "automergeType": "branch"
     },
     {
-      "description": "Molecule's own dependencies merge via branch push (no PR, no email). Anything under molecule-shared/ - the helper container images, Postgres, and the Python pins - triggers the Molecule workflow, and a change to a shared file makes it run every scenario, so an update only merges once the whole suite has passed on it. A failure surfaces as a PR instead. This is how a new Postgres major reaches us: the bump runs every scenario against it before anything is merged.",
+      "description": "Molecule's own dependencies merge via branch push (no PR, no email). Shared helper image updates run their consuming scenarios, including indirect consumers through shared tasks. Shared Python and Ansible requirements and workflow changes run every scenario. An update only merges once the selected checks pass; a failure surfaces as a PR instead. A new Postgres major is exercised by every Postgres-consuming scenario before merging.",
       "matchFileNames": [
         "molecule-shared/**",
         ".github/workflows/molecule.yml"
