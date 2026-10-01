@@ -1471,6 +1471,11 @@ matrix_mautrix_bluesky_metrics_proxying_enabled: "{{ matrix_mautrix_bluesky_metr
 matrix_mautrix_bluesky_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
 matrix_mautrix_bluesky_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/mautrix-bluesky"
 
+matrix_mautrix_bluesky_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
+matrix_mautrix_bluesky_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
+matrix_mautrix_bluesky_exposure_hostname: "{{ matrix_bridges_exposure_hostname }}"
+matrix_mautrix_bluesky_exposure_path_prefix: "{{ matrix_bridges_exposure_path_prefix }}/bluesky"
+
 matrix_mautrix_bluesky_database_hostname: "{{ postgres_connection_hostname if postgres_enabled else '' }}"
 matrix_mautrix_bluesky_database_password: "{{ (matrix_homeserver_generic_secret_key + ':mau.twt.db') | hash('sha512') | to_uuid if postgres_enabled else '' }}"
 
@@ -1654,8 +1659,15 @@ matrix_mautrix_slack_container_additional_networks_auto: |-
       ([] if matrix_addons_homeserver_container_network == '' else [matrix_addons_homeserver_container_network])
       +
       ([postgres_container_network] if (postgres_enabled and matrix_mautrix_slack_database_hostname == postgres_connection_hostname and matrix_mautrix_slack_container_network != postgres_container_network) else [])
+      +
+      ([matrix_playbook_reverse_proxyable_services_additional_network] if matrix_playbook_reverse_proxyable_services_additional_network and matrix_mautrix_slack_container_labels_traefik_enabled else [])
     ) | unique
   }}
+
+matrix_mautrix_slack_container_labels_traefik_enabled: "{{ matrix_playbook_reverse_proxy_type in ['playbook-managed-traefik', 'other-traefik-container'] }}"
+matrix_mautrix_slack_container_labels_traefik_docker_network: "{{ matrix_playbook_reverse_proxyable_services_additional_network }}"
+matrix_mautrix_slack_container_labels_traefik_entrypoints: "{{ traefik_entrypoint_primary }}"
+matrix_mautrix_slack_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
 
 matrix_mautrix_slack_appservice_token: "{{ (matrix_homeserver_generic_secret_key + ':mauslack.as.tok') | hash('sha512') | to_uuid }}"
 
@@ -1680,6 +1692,11 @@ matrix_mautrix_slack_database_password: "{{ (matrix_homeserver_generic_secret_ke
 
 matrix_mautrix_slack_provisioning_shared_secret: "{{ (matrix_homeserver_generic_secret_key + ':mau.slack.prov') | hash('sha512') | to_uuid }}"
 matrix_mautrix_slack_public_media_signing_key: "{{ (matrix_homeserver_generic_secret_key + ':mau.slack.pmed') | hash('sha512') | to_uuid }}"
+
+matrix_mautrix_slack_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
+matrix_mautrix_slack_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
+matrix_mautrix_slack_exposure_hostname: "{{ matrix_bridges_exposure_hostname }}"
+matrix_mautrix_slack_exposure_path_prefix: "{{ matrix_bridges_exposure_path_prefix }}/slack"
 
 ######################################################################
 #
@@ -1829,6 +1846,11 @@ matrix_mautrix_signal_metrics_proxying_enabled: "{{ matrix_mautrix_signal_metric
 matrix_mautrix_signal_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
 matrix_mautrix_signal_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/mautrix-signal"
 
+matrix_mautrix_signal_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
+matrix_mautrix_signal_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
+matrix_mautrix_signal_exposure_hostname: "{{ matrix_bridges_exposure_hostname }}"
+matrix_mautrix_signal_exposure_path_prefix: "{{ matrix_bridges_exposure_path_prefix }}/signal"
+
 matrix_mautrix_signal_database_engine: "{{ 'postgres' if postgres_enabled else 'sqlite' }}"
 matrix_mautrix_signal_database_hostname: "{{ postgres_connection_hostname if postgres_enabled else '' }}"
 matrix_mautrix_signal_database_password: "{{ (matrix_homeserver_generic_secret_key + ':mau.signal.db') | hash('sha512') | to_uuid }}"
@@ -1889,6 +1911,7 @@ matrix_mautrix_meta_messenger_appservice_token: "{{ (matrix_homeserver_generic_s
 matrix_mautrix_meta_messenger_homeserver_address: "{{ matrix_addons_homeserver_client_api_url }}"
 
 matrix_mautrix_meta_messenger_homeserver_token: "{{ (matrix_homeserver_generic_secret_key + ':mau.meta.fb.hs') | hash('sha512') | to_uuid }}"
+matrix_mautrix_meta_messenger_provisioning_shared_secret: "{{ (matrix_homeserver_generic_secret_key + ':mau.meta.fb.prov') | hash('sha512') | to_uuid }}"
 
 matrix_mautrix_meta_messenger_homeserver_async_media: "{{ matrix_homeserver_implementation in ['synapse'] }}"
 
@@ -1906,6 +1929,11 @@ matrix_mautrix_meta_messenger_metrics_enabled: "{{ prometheus_enabled or matrix_
 matrix_mautrix_meta_messenger_metrics_proxying_enabled: "{{ matrix_mautrix_meta_messenger_metrics_enabled and matrix_metrics_exposure_enabled }}"
 matrix_mautrix_meta_messenger_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
 matrix_mautrix_meta_messenger_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/mautrix-meta-messenger"
+
+matrix_mautrix_meta_messenger_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
+matrix_mautrix_meta_messenger_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
+matrix_mautrix_meta_messenger_exposure_hostname: "{{ matrix_bridges_exposure_hostname }}"
+matrix_mautrix_meta_messenger_exposure_path_prefix: "{{ matrix_bridges_exposure_path_prefix }}/meta-messenger"
 
 # We'd like to force-set people with external Postgres to SQLite, so the bridge role can complain
 # and point them to a migration path.
@@ -1967,6 +1995,7 @@ matrix_mautrix_meta_instagram_appservice_token: "{{ (matrix_homeserver_generic_s
 matrix_mautrix_meta_instagram_homeserver_address: "{{ matrix_addons_homeserver_client_api_url }}"
 
 matrix_mautrix_meta_instagram_homeserver_token: "{{ (matrix_homeserver_generic_secret_key + ':mau.meta.ig.hs') | hash('sha512') | to_uuid }}"
+matrix_mautrix_meta_instagram_provisioning_shared_secret: "{{ (matrix_homeserver_generic_secret_key + ':mau.meta.ig.prov') | hash('sha512') | to_uuid }}"
 
 matrix_mautrix_meta_instagram_homeserver_async_media: "{{ matrix_homeserver_implementation in ['synapse'] }}"
 
@@ -1984,6 +2013,11 @@ matrix_mautrix_meta_instagram_metrics_enabled: "{{ prometheus_enabled or matrix_
 matrix_mautrix_meta_instagram_metrics_proxying_enabled: "{{ matrix_mautrix_meta_instagram_metrics_enabled and matrix_metrics_exposure_enabled }}"
 matrix_mautrix_meta_instagram_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
 matrix_mautrix_meta_instagram_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/mautrix-meta-instagram"
+
+matrix_mautrix_meta_instagram_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
+matrix_mautrix_meta_instagram_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
+matrix_mautrix_meta_instagram_exposure_hostname: "{{ matrix_bridges_exposure_hostname }}"
+matrix_mautrix_meta_instagram_exposure_path_prefix: "{{ matrix_bridges_exposure_path_prefix }}/meta-instagram"
 
 # We'd like to force-set people with external Postgres to SQLite, so the bridge role can complain
 # and point them to a migration path.
@@ -2064,6 +2098,11 @@ matrix_mautrix_telegram_metrics_proxying_enabled: "{{ matrix_mautrix_telegram_me
 matrix_mautrix_telegram_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
 matrix_mautrix_telegram_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/mautrix-telegram"
 
+matrix_mautrix_telegram_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
+matrix_mautrix_telegram_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
+matrix_mautrix_telegram_exposure_hostname: "{{ matrix_bridges_exposure_hostname }}"
+matrix_mautrix_telegram_exposure_path_prefix: "{{ matrix_bridges_exposure_path_prefix }}/telegram"
+
 # Postgres is the default, except if not using internal Postgres server
 matrix_mautrix_telegram_database_engine: "{{ 'postgres' if postgres_enabled else 'sqlite' }}"
 matrix_mautrix_telegram_database_hostname: "{{ postgres_connection_hostname if postgres_enabled else '' }}"
@@ -2140,6 +2179,11 @@ matrix_mautrix_twitter_metrics_proxying_enabled: "{{ matrix_mautrix_twitter_metr
 matrix_mautrix_twitter_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
 matrix_mautrix_twitter_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/mautrix-twitter"
 
+matrix_mautrix_twitter_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
+matrix_mautrix_twitter_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
+matrix_mautrix_twitter_exposure_hostname: "{{ matrix_bridges_exposure_hostname }}"
+matrix_mautrix_twitter_exposure_path_prefix: "{{ matrix_bridges_exposure_path_prefix }}/twitter"
+
 matrix_mautrix_twitter_database_hostname: "{{ postgres_connection_hostname if postgres_enabled else '' }}"
 matrix_mautrix_twitter_database_password: "{{ (matrix_homeserver_generic_secret_key + ':mau.twt.db') | hash('sha512') | to_uuid if postgres_enabled else '' }}"
 
@@ -2195,6 +2239,8 @@ matrix_mautrix_gmessages_appservice_token: "{{ (matrix_homeserver_generic_secret
 matrix_mautrix_gmessages_homeserver_address: "{{ matrix_addons_homeserver_client_api_url }}"
 matrix_mautrix_gmessages_homeserver_token: "{{ (matrix_homeserver_generic_secret_key + ':gmessa.hs.token') | hash('sha512') | to_uuid }}"
 
+matrix_mautrix_gmessages_provisioning_shared_secret: "{{ (matrix_homeserver_generic_secret_key + ':gmessa.prov') | hash('sha512') | to_uuid }}"
+
 matrix_mautrix_gmessages_homeserver_async_media: "{{ matrix_homeserver_implementation in ['synapse'] }}"
 
 matrix_mautrix_gmessages_double_puppet_secrets_auto: |-
@@ -2211,6 +2257,11 @@ matrix_mautrix_gmessages_metrics_enabled: "{{ prometheus_enabled or matrix_metri
 matrix_mautrix_gmessages_metrics_proxying_enabled: "{{ matrix_mautrix_gmessages_metrics_enabled and matrix_metrics_exposure_enabled }}"
 matrix_mautrix_gmessages_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
 matrix_mautrix_gmessages_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/mautrix-gmessages"
+
+matrix_mautrix_gmessages_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
+matrix_mautrix_gmessages_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
+matrix_mautrix_gmessages_exposure_hostname: "{{ matrix_bridges_exposure_hostname }}"
+matrix_mautrix_gmessages_exposure_path_prefix: "{{ matrix_bridges_exposure_path_prefix }}/gmessages"
 
 # Postgres is the default, except if not using internal Postgres server
 matrix_mautrix_gmessages_database_engine: "{{ 'postgres' if postgres_enabled else 'sqlite' }}"
@@ -2376,6 +2427,7 @@ matrix_mautrix_whatsapp_appservice_token: "{{ (matrix_homeserver_generic_secret_
 
 matrix_mautrix_whatsapp_homeserver_address: "{{ matrix_addons_homeserver_client_api_url }}"
 matrix_mautrix_whatsapp_homeserver_token: "{{ (matrix_homeserver_generic_secret_key + ':wa.hs.token') | hash('sha512') | to_uuid }}"
+matrix_mautrix_whatsapp_provisioning_shared_secret: "{{ (matrix_homeserver_generic_secret_key + ':wa.prov') | hash('sha512') | to_uuid }}"
 
 matrix_mautrix_whatsapp_homeserver_async_media: "{{ matrix_homeserver_implementation in ['synapse'] }}"
 
@@ -2393,6 +2445,11 @@ matrix_mautrix_whatsapp_metrics_enabled: "{{ prometheus_enabled or matrix_metric
 matrix_mautrix_whatsapp_metrics_proxying_enabled: "{{ matrix_mautrix_whatsapp_metrics_enabled and matrix_metrics_exposure_enabled }}"
 matrix_mautrix_whatsapp_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
 matrix_mautrix_whatsapp_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/mautrix-whatsapp"
+
+matrix_mautrix_whatsapp_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
+matrix_mautrix_whatsapp_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
+matrix_mautrix_whatsapp_exposure_hostname: "{{ matrix_bridges_exposure_hostname }}"
+matrix_mautrix_whatsapp_exposure_path_prefix: "{{ matrix_bridges_exposure_path_prefix }}/whatsapp"
 
 # Postgres is the default, except if not using internal Postgres server
 matrix_mautrix_whatsapp_database_engine: "{{ 'postgres' if postgres_enabled else 'sqlite' }}"
@@ -5960,6 +6017,24 @@ matrix_static_files_file_matrix_client_property_org_matrix_msc4143_rtc_foci_auto
     (
       [{'type': 'livekit', 'livekit_service_url': matrix_livekit_jwt_service_public_url}] if matrix_livekit_jwt_service_enabled else []
     )
+  }}
+
+# Advertise all enabled and exposed mautrix bridges for auto-discovery by tools like Mautrix Manager.
+# A bridge's public address is only reachable when the playbook attaches its Traefik labels and emits the exposure router,
+# so we gate on these in addition to the bridge being enabled.
+matrix_static_files_file_matrix_mautrix_property_fi_mau_bridges_auto: |-
+  {{
+    [
+      matrix_mautrix_bluesky_appservice_public_address if (matrix_mautrix_bluesky_enabled and matrix_mautrix_bluesky_container_labels_traefik_enabled and matrix_mautrix_bluesky_container_labels_exposure_enabled) else '',
+      matrix_mautrix_gmessages_bridge_public_address if (matrix_mautrix_gmessages_enabled and matrix_mautrix_gmessages_container_labels_traefik_enabled and matrix_mautrix_gmessages_container_labels_exposure_enabled) else '',
+      matrix_mautrix_meta_instagram_bridge_public_address if (matrix_mautrix_meta_instagram_enabled and matrix_mautrix_meta_instagram_container_labels_traefik_enabled and matrix_mautrix_meta_instagram_container_labels_exposure_enabled) else '',
+      matrix_mautrix_meta_messenger_bridge_public_address if (matrix_mautrix_meta_messenger_enabled and matrix_mautrix_meta_messenger_container_labels_traefik_enabled and matrix_mautrix_meta_messenger_container_labels_exposure_enabled) else '',
+      matrix_mautrix_signal_bridge_public_address if (matrix_mautrix_signal_enabled and matrix_mautrix_signal_container_labels_traefik_enabled and matrix_mautrix_signal_container_labels_exposure_enabled) else '',
+      matrix_mautrix_slack_bridge_public_address if (matrix_mautrix_slack_enabled and matrix_mautrix_slack_container_labels_traefik_enabled and matrix_mautrix_slack_container_labels_exposure_enabled) else '',
+      matrix_mautrix_telegram_bridge_public_address if (matrix_mautrix_telegram_enabled and matrix_mautrix_telegram_container_labels_traefik_enabled and matrix_mautrix_telegram_container_labels_exposure_enabled) else '',
+      matrix_mautrix_twitter_appservice_public_address if (matrix_mautrix_twitter_enabled and matrix_mautrix_twitter_container_labels_traefik_enabled and matrix_mautrix_twitter_container_labels_exposure_enabled) else '',
+      matrix_mautrix_whatsapp_bridge_public_address if (matrix_mautrix_whatsapp_enabled and matrix_mautrix_whatsapp_container_labels_traefik_enabled and matrix_mautrix_whatsapp_container_labels_exposure_enabled) else '',
+    ] | select | list
   }}
 
 matrix_static_files_file_matrix_server_property_m_server: "{{ matrix_server_fqn_matrix_federation }}:{{ matrix_federation_public_port }}"
