@@ -4,7 +4,7 @@
   version: v2.0.0-0
   name: auxiliary
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-backup_borg.git
-  version: v1.4.5-2.1.8-1
+  version: v1.4.5-2.1.9-1
   name: backup_borg
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-cinny.git
   version: v4.12.7-1
@@ -17,7 +17,7 @@
   name: coturn
   activation_prefix: coturn_
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-ddclient.git
-  version: v4.0.0-6
+  version: v4.0.0-8
   name: ddclient
   activation_prefix: ddclient_
 - src: git+https://github.com/geerlingguy/ansible-role-docker
@@ -30,7 +30,7 @@
   version: v3.3.6-0
   name: etherpad
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-exim-relay.git
-  version: v4.99.1-r0-2-4
+  version: v4.99.5-r0-1-0
   name: exim_relay
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-grafana.git
   version: v13.0.2-3
@@ -63,7 +63,7 @@
   version: v18-5
   name: postgres_backup
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-prometheus.git
-  version: v3.14.0-1
+  version: v3.15.0-0
   name: prometheus
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-prometheus-nginxlog-exporter.git
   version: v1.11.0-2
@@ -75,7 +75,7 @@
   version: v0.20.1-2
   name: prometheus_postgres_exporter
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-sable.git
-  version: v1.22.6-0
+  version: v1.22.11-0
   name: sable
 - src: git+https://github.com/devture/com.devture.ansible.role.systemd_docker_base.git
   version: v1.5.0-0
@@ -87,7 +87,7 @@
   version: v1.1.0-1
   name: timesync
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-traefik.git
-  version: v3.7.13-3
+  version: v3.7.13-4
   name: traefik
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-traefik-certs-dumper.git
   version: v2.11.4-2
