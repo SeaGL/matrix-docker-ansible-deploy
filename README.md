@@ -117,6 +117,7 @@ Bridges can be used to connect your Matrix installation with third-party communi
 | [mautrix-telegram](https://github.com/mautrix/telegram) | ❌ | Bridge to [Telegram](https://telegram.org/) | [Link](docs/configuring-playbook-bridge-mautrix-telegram.md) |
 | [mautrix-gmessages](https://github.com/mautrix/gmessages) | ❌ | Bridge to [Google Messages](https://messages.google.com/) | [Link](docs/configuring-playbook-bridge-mautrix-gmessages.md) |
 | [mautrix-gvoice](https://github.com/mautrix/gvoice) | ❌ | Bridge to [Google Voice](https://voice.google.com/) | [Link](docs/configuring-playbook-bridge-mautrix-gvoice.md) |
+| [mautrix-linkedin](https://github.com/mautrix/linkedin) | ❌ | Bridge to [LinkedIn](https://www.linkedin.com/) | [Link](docs/configuring-playbook-bridge-mautrix-linkedin.md) |
 | [mautrix-whatsapp](https://github.com/mautrix/whatsapp) | ❌ | Bridge to [WhatsApp](https://www.whatsapp.com/) | [Link](docs/configuring-playbook-bridge-mautrix-whatsapp.md) |
 | [mautrix-wsproxy](https://github.com/mautrix/wsproxy) | ❌ | Bridge to Android SMS or Apple iMessage | [Link](docs/configuring-playbook-bridge-mautrix-wsproxy.md) |
 | [matrix-rustpush-bridge](https://github.com/jasonlaguidice/imessage) | ❌ | Bridge to [iMessage](https://support.apple.com/messages) via Apple Push Notification service | [Link](docs/configuring-playbook-bridge-rustpush.md) |
@@ -125,7 +126,6 @@ Bridges can be used to connect your Matrix installation with third-party communi
 | [mautrix-googlechat](https://github.com/mautrix/googlechat) | ❌ | Bridge to [Google Chat](https://en.wikipedia.org/wiki/Google_Chat) | [Link](docs/configuring-playbook-bridge-mautrix-googlechat.md) |
 | [mautrix-meta](https://github.com/mautrix/meta) | ❌ | Bridge to [Messenger](https://messenger.com/) and [Instagram](https://instagram.com/) | Link for [Messenger](docs/configuring-playbook-bridge-mautrix-meta-messenger.md) / [Instagram](docs/configuring-playbook-bridge-mautrix-meta-instagram.md) |
 | [mautrix-signal](https://github.com/mautrix/signal) | ❌ | Bridge to [Signal](https://www.signal.org/) | [Link](docs/configuring-playbook-bridge-mautrix-signal.md) |
-| [beeper-linkedin](https://github.com/beeper/linkedin) | ❌ | Bridge to [LinkedIn](https://www.linkedin.com/) | [Link](docs/configuring-playbook-bridge-beeper-linkedin.md) |
 | [beeper-line](https://github.com/beeper/line) | ❌ | Bridge to [LINE](https://line.me/) | [Link](docs/configuring-playbook-bridge-beeper-line.md) |
 | [matrix-appservice-irc](https://github.com/matrix-org/matrix-appservice-irc) | ❌ | Bridge to [IRC](https://wikipedia.org/wiki/Internet_Relay_Chat) | [Link](docs/configuring-playbook-bridge-appservice-irc.md) |
 | [matrix-appservice-discord](https://github.com/matrix-org/matrix-appservice-discord) | ❌ | Bridge to [Discord](https://discordapp.com/) | [Link](docs/configuring-playbook-bridge-appservice-discord.md) |

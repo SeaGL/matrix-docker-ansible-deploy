@@ -136,6 +136,8 @@ matrix_homeserver_container_extra_arguments_auto: |
     +
     (['--mount type=bind,src=' + matrix_bridge_mautrix_gvoice_config_path + '/registration.yaml,dst=/matrix-mautrix-gvoice-registration.yaml,ro'] if matrix_bridge_mautrix_gvoice_enabled else [])
     +
+    (['--mount type=bind,src=' + matrix_bridge_mautrix_linkedin_config_path + '/registration.yaml,dst=/matrix-mautrix-linkedin-registration.yaml,ro'] if matrix_bridge_mautrix_linkedin_enabled else [])
+    +
     (['--mount type=bind,src=' + matrix_bridge_mautrix_whatsapp_config_path + '/registration.yaml,dst=/matrix-mautrix-whatsapp-registration.yaml,ro'] if matrix_bridge_mautrix_whatsapp_enabled else [])
     +
     (['--mount type=bind,src=' + matrix_bridge_mautrix_wsproxy_config_path + '/androidsms-registration.yaml,dst=/matrix-mautrix-androidsms-registration.yaml,ro'] if matrix_bridge_mautrix_wsproxy_enabled else [])
@@ -196,6 +198,8 @@ matrix_homeserver_app_service_config_files_auto: |
     (['/matrix-mautrix-gmessages-registration.yaml'] if matrix_bridge_mautrix_gmessages_enabled else [])
     +
     (['/matrix-mautrix-gvoice-registration.yaml'] if matrix_bridge_mautrix_gvoice_enabled else [])
+    +
+    (['/matrix-mautrix-linkedin-registration.yaml'] if matrix_bridge_mautrix_linkedin_enabled else [])
     +
     (['/matrix-mautrix-whatsapp-registration.yaml'] if matrix_bridge_mautrix_whatsapp_enabled else [])
     +
@@ -506,6 +510,13 @@ devture_systemd_service_manager_services_list_auto: |
       'restart_necessary': (matrix_bridge_mautrix_gvoice_restart_necessary | bool),
       'groups': ['matrix', 'bridges', 'mautrix-gvoice'],
     }] if matrix_bridge_mautrix_gvoice_enabled else [])
+    +
+    ([{
+      'name': 'matrix-mautrix-linkedin.service',
+      'priority': 2000,
+      'restart_necessary': (matrix_bridge_mautrix_linkedin_restart_necessary | bool),
+      'groups': ['matrix', 'bridges', 'mautrix-linkedin'],
+    }] if matrix_bridge_mautrix_linkedin_enabled else [])
     +
     ([{
       'name': 'matrix-mautrix-whatsapp.service',
@@ -1464,9 +1475,6 @@ matrix_bridge_mautrix_bluesky_container_labels_traefik_docker_network: "{{ matri
 matrix_bridge_mautrix_bluesky_container_labels_traefik_entrypoints: "{{ traefik_entrypoint_primary }}"
 matrix_bridge_mautrix_bluesky_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
 
-matrix_bridge_mautrix_bluesky_container_labels_metrics_middleware_basic_auth_enabled: "{{ matrix_metrics_exposure_http_basic_auth_enabled }}"
-matrix_bridge_mautrix_bluesky_container_labels_metrics_middleware_basic_auth_users: "{{ matrix_metrics_exposure_http_basic_auth_users }}"
-
 matrix_bridge_mautrix_bluesky_appservice_token: "{{ (matrix_homeserver_generic_secret_key + ':bsky.as.token') | hash('sha512') | to_uuid }}"
 
 matrix_bridge_mautrix_bluesky_homeserver_address: "{{ matrix_addons_homeserver_client_api_url }}"
@@ -1484,12 +1492,6 @@ matrix_bridge_mautrix_bluesky_double_puppet_secrets_auto: |-
     if matrix_appservice_double_puppet_enabled
     else {}
   }}
-
-matrix_bridge_mautrix_bluesky_metrics_enabled: "{{ prometheus_enabled or matrix_metrics_exposure_enabled }}"
-
-matrix_bridge_mautrix_bluesky_metrics_proxying_enabled: "{{ matrix_bridge_mautrix_bluesky_metrics_enabled and matrix_metrics_exposure_enabled }}"
-matrix_bridge_mautrix_bluesky_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
-matrix_bridge_mautrix_bluesky_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/mautrix-bluesky"
 
 matrix_bridge_mautrix_bluesky_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
 matrix_bridge_mautrix_bluesky_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
@@ -1530,18 +1532,8 @@ matrix_bridge_rustpush_container_additional_networks_auto: |-
       ([] if matrix_addons_homeserver_container_network == '' else [matrix_addons_homeserver_container_network])
       +
       ([postgres_container_network] if (postgres_enabled and matrix_bridge_rustpush_database_hostname == postgres_connection_hostname and matrix_bridge_rustpush_container_network != postgres_container_network) else [])
-      +
-      ([matrix_playbook_reverse_proxyable_services_additional_network] if matrix_playbook_reverse_proxyable_services_additional_network and matrix_bridge_rustpush_container_labels_traefik_enabled else [])
     ) | unique
   }}
-
-matrix_bridge_rustpush_container_labels_traefik_enabled: "{{ matrix_playbook_reverse_proxy_type in ['playbook-managed-traefik', 'other-traefik-container'] }}"
-matrix_bridge_rustpush_container_labels_traefik_docker_network: "{{ matrix_playbook_reverse_proxyable_services_additional_network }}"
-matrix_bridge_rustpush_container_labels_traefik_entrypoints: "{{ traefik_entrypoint_primary }}"
-matrix_bridge_rustpush_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
-
-matrix_bridge_rustpush_container_labels_metrics_middleware_basic_auth_enabled: "{{ matrix_metrics_exposure_http_basic_auth_enabled }}"
-matrix_bridge_rustpush_container_labels_metrics_middleware_basic_auth_users: "{{ matrix_metrics_exposure_http_basic_auth_users }}"
 
 matrix_bridge_rustpush_appservice_token: "{{ (matrix_homeserver_generic_secret_key + ':imsg.as.token') | hash('sha512') | to_uuid }}"
 
@@ -1560,12 +1552,6 @@ matrix_bridge_rustpush_double_puppet_secrets_auto: |-
     if matrix_appservice_double_puppet_enabled
     else {}
   }}
-
-matrix_bridge_rustpush_metrics_enabled: "{{ prometheus_enabled or matrix_metrics_exposure_enabled }}"
-
-matrix_bridge_rustpush_metrics_proxying_enabled: "{{ matrix_bridge_rustpush_metrics_enabled and matrix_metrics_exposure_enabled }}"
-matrix_bridge_rustpush_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
-matrix_bridge_rustpush_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/rustpush-bridge"
 
 matrix_bridge_rustpush_database_hostname: "{{ postgres_connection_hostname if postgres_enabled else '' }}"
 matrix_bridge_rustpush_database_password: "{{ (matrix_homeserver_generic_secret_key + ':mau.imsg.db') | hash('sha512') | to_uuid if postgres_enabled else '' }}"
@@ -1840,9 +1826,6 @@ matrix_bridge_mautrix_signal_container_labels_traefik_docker_network: "{{ matrix
 matrix_bridge_mautrix_signal_container_labels_traefik_entrypoints: "{{ traefik_entrypoint_primary }}"
 matrix_bridge_mautrix_signal_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
 
-matrix_bridge_mautrix_signal_container_labels_metrics_middleware_basic_auth_enabled: "{{ matrix_metrics_exposure_http_basic_auth_enabled }}"
-matrix_bridge_mautrix_signal_container_labels_metrics_middleware_basic_auth_users: "{{ matrix_metrics_exposure_http_basic_auth_users }}"
-
 matrix_bridge_mautrix_signal_homeserver_domain: '{{ matrix_domain }}'
 matrix_bridge_mautrix_signal_homeserver_address: "{{ matrix_addons_homeserver_client_api_url }}"
 matrix_bridge_mautrix_signal_homeserver_token: "{{ (matrix_homeserver_generic_secret_key + ':si.hs.token') | hash('sha512') | to_uuid }}"
@@ -1859,12 +1842,6 @@ matrix_bridge_mautrix_signal_double_puppet_secrets_auto: |-
     if matrix_appservice_double_puppet_enabled
     else {}
   }}
-
-matrix_bridge_mautrix_signal_metrics_enabled: "{{ prometheus_enabled or matrix_metrics_exposure_enabled }}"
-
-matrix_bridge_mautrix_signal_metrics_proxying_enabled: "{{ matrix_bridge_mautrix_signal_metrics_enabled and matrix_metrics_exposure_enabled }}"
-matrix_bridge_mautrix_signal_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
-matrix_bridge_mautrix_signal_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/mautrix-signal"
 
 matrix_bridge_mautrix_signal_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
 matrix_bridge_mautrix_signal_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
@@ -1923,9 +1900,6 @@ matrix_bridge_mautrix_meta_messenger_container_labels_traefik_docker_network: "{
 matrix_bridge_mautrix_meta_messenger_container_labels_traefik_entrypoints: "{{ traefik_entrypoint_primary }}"
 matrix_bridge_mautrix_meta_messenger_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
 
-matrix_bridge_mautrix_meta_messenger_container_labels_metrics_middleware_basic_auth_enabled: "{{ matrix_metrics_exposure_http_basic_auth_enabled }}"
-matrix_bridge_mautrix_meta_messenger_container_labels_metrics_middleware_basic_auth_users: "{{ matrix_metrics_exposure_http_basic_auth_users }}"
-
 matrix_bridge_mautrix_meta_messenger_appservice_token: "{{ (matrix_homeserver_generic_secret_key + ':mau.meta.fb.as') | hash('sha512') | to_uuid }}"
 
 matrix_bridge_mautrix_meta_messenger_homeserver_address: "{{ matrix_addons_homeserver_client_api_url }}"
@@ -1943,12 +1917,6 @@ matrix_bridge_mautrix_meta_messenger_double_puppet_secrets_auto: |-
     if matrix_appservice_double_puppet_enabled
     else {}
   }}
-
-matrix_bridge_mautrix_meta_messenger_metrics_enabled: "{{ prometheus_enabled or matrix_metrics_exposure_enabled }}"
-
-matrix_bridge_mautrix_meta_messenger_metrics_proxying_enabled: "{{ matrix_bridge_mautrix_meta_messenger_metrics_enabled and matrix_metrics_exposure_enabled }}"
-matrix_bridge_mautrix_meta_messenger_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
-matrix_bridge_mautrix_meta_messenger_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/mautrix-meta-messenger"
 
 matrix_bridge_mautrix_meta_messenger_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
 matrix_bridge_mautrix_meta_messenger_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
@@ -2007,9 +1975,6 @@ matrix_bridge_mautrix_meta_instagram_container_labels_traefik_docker_network: "{
 matrix_bridge_mautrix_meta_instagram_container_labels_traefik_entrypoints: "{{ traefik_entrypoint_primary }}"
 matrix_bridge_mautrix_meta_instagram_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
 
-matrix_bridge_mautrix_meta_instagram_container_labels_metrics_middleware_basic_auth_enabled: "{{ matrix_metrics_exposure_http_basic_auth_enabled }}"
-matrix_bridge_mautrix_meta_instagram_container_labels_metrics_middleware_basic_auth_users: "{{ matrix_metrics_exposure_http_basic_auth_users }}"
-
 matrix_bridge_mautrix_meta_instagram_appservice_token: "{{ (matrix_homeserver_generic_secret_key + ':mau.meta.ig.as') | hash('sha512') | to_uuid }}"
 
 matrix_bridge_mautrix_meta_instagram_homeserver_address: "{{ matrix_addons_homeserver_client_api_url }}"
@@ -2027,12 +1992,6 @@ matrix_bridge_mautrix_meta_instagram_double_puppet_secrets_auto: |-
     if matrix_appservice_double_puppet_enabled
     else {}
   }}
-
-matrix_bridge_mautrix_meta_instagram_metrics_enabled: "{{ prometheus_enabled or matrix_metrics_exposure_enabled }}"
-
-matrix_bridge_mautrix_meta_instagram_metrics_proxying_enabled: "{{ matrix_bridge_mautrix_meta_instagram_metrics_enabled and matrix_metrics_exposure_enabled }}"
-matrix_bridge_mautrix_meta_instagram_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
-matrix_bridge_mautrix_meta_instagram_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/mautrix-meta-instagram"
 
 matrix_bridge_mautrix_meta_instagram_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
 matrix_bridge_mautrix_meta_instagram_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
@@ -2090,9 +2049,6 @@ matrix_bridge_mautrix_telegram_container_labels_traefik_docker_network: "{{ matr
 matrix_bridge_mautrix_telegram_container_labels_traefik_entrypoints: "{{ traefik_entrypoint_primary }}"
 matrix_bridge_mautrix_telegram_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
 
-matrix_bridge_mautrix_telegram_container_labels_metrics_middleware_basic_auth_enabled: "{{ matrix_metrics_exposure_http_basic_auth_enabled }}"
-matrix_bridge_mautrix_telegram_container_labels_metrics_middleware_basic_auth_users: "{{ matrix_metrics_exposure_http_basic_auth_users }}"
-
 matrix_bridge_mautrix_telegram_appservice_token: "{{ (matrix_homeserver_generic_secret_key + ':telegr.as.token') | hash('sha512') | to_uuid }}"
 
 matrix_bridge_mautrix_telegram_homeserver_domain: "{{ matrix_domain }}"
@@ -2111,12 +2067,6 @@ matrix_bridge_mautrix_telegram_double_puppet_secrets_auto: |-
     if matrix_appservice_double_puppet_enabled
     else {}
   }}
-
-matrix_bridge_mautrix_telegram_metrics_enabled: "{{ prometheus_enabled or matrix_metrics_exposure_enabled }}"
-
-matrix_bridge_mautrix_telegram_metrics_proxying_enabled: "{{ matrix_bridge_mautrix_telegram_metrics_enabled and matrix_metrics_exposure_enabled }}"
-matrix_bridge_mautrix_telegram_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
-matrix_bridge_mautrix_telegram_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/mautrix-telegram"
 
 matrix_bridge_mautrix_telegram_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
 matrix_bridge_mautrix_telegram_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
@@ -2172,9 +2122,6 @@ matrix_bridge_mautrix_twitter_container_labels_traefik_docker_network: "{{ matri
 matrix_bridge_mautrix_twitter_container_labels_traefik_entrypoints: "{{ traefik_entrypoint_primary }}"
 matrix_bridge_mautrix_twitter_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
 
-matrix_bridge_mautrix_twitter_container_labels_metrics_middleware_basic_auth_enabled: "{{ matrix_metrics_exposure_http_basic_auth_enabled }}"
-matrix_bridge_mautrix_twitter_container_labels_metrics_middleware_basic_auth_users: "{{ matrix_metrics_exposure_http_basic_auth_users }}"
-
 matrix_bridge_mautrix_twitter_appservice_token: "{{ (matrix_homeserver_generic_secret_key + ':twt.as.token') | hash('sha512') | to_uuid }}"
 
 matrix_bridge_mautrix_twitter_homeserver_address: "{{ matrix_addons_homeserver_client_api_url }}"
@@ -2192,12 +2139,6 @@ matrix_bridge_mautrix_twitter_double_puppet_secrets_auto: |-
     if matrix_appservice_double_puppet_enabled
     else {}
   }}
-
-matrix_bridge_mautrix_twitter_metrics_enabled: "{{ prometheus_enabled or matrix_metrics_exposure_enabled }}"
-
-matrix_bridge_mautrix_twitter_metrics_proxying_enabled: "{{ matrix_bridge_mautrix_twitter_metrics_enabled and matrix_metrics_exposure_enabled }}"
-matrix_bridge_mautrix_twitter_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
-matrix_bridge_mautrix_twitter_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/mautrix-twitter"
 
 matrix_bridge_mautrix_twitter_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
 matrix_bridge_mautrix_twitter_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
@@ -2251,9 +2192,6 @@ matrix_bridge_mautrix_gmessages_container_labels_traefik_docker_network: "{{ mat
 matrix_bridge_mautrix_gmessages_container_labels_traefik_entrypoints: "{{ traefik_entrypoint_primary }}"
 matrix_bridge_mautrix_gmessages_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
 
-matrix_bridge_mautrix_gmessages_container_labels_metrics_middleware_basic_auth_enabled: "{{ matrix_metrics_exposure_http_basic_auth_enabled }}"
-matrix_bridge_mautrix_gmessages_container_labels_metrics_middleware_basic_auth_users: "{{ matrix_metrics_exposure_http_basic_auth_users }}"
-
 matrix_bridge_mautrix_gmessages_appservice_token: "{{ (matrix_homeserver_generic_secret_key + ':gmessa.as.token') | hash('sha512') | to_uuid }}"
 
 matrix_bridge_mautrix_gmessages_homeserver_address: "{{ matrix_addons_homeserver_client_api_url }}"
@@ -2271,12 +2209,6 @@ matrix_bridge_mautrix_gmessages_double_puppet_secrets_auto: |-
     if matrix_appservice_double_puppet_enabled
     else {}
   }}
-
-matrix_bridge_mautrix_gmessages_metrics_enabled: "{{ prometheus_enabled or matrix_metrics_exposure_enabled }}"
-
-matrix_bridge_mautrix_gmessages_metrics_proxying_enabled: "{{ matrix_bridge_mautrix_gmessages_metrics_enabled and matrix_metrics_exposure_enabled }}"
-matrix_bridge_mautrix_gmessages_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
-matrix_bridge_mautrix_gmessages_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/mautrix-gmessages"
 
 matrix_bridge_mautrix_gmessages_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
 matrix_bridge_mautrix_gmessages_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
@@ -2332,9 +2264,6 @@ matrix_bridge_mautrix_gvoice_container_labels_traefik_docker_network: "{{ matrix
 matrix_bridge_mautrix_gvoice_container_labels_traefik_entrypoints: "{{ traefik_entrypoint_primary }}"
 matrix_bridge_mautrix_gvoice_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
 
-matrix_bridge_mautrix_gvoice_container_labels_metrics_middleware_basic_auth_enabled: "{{ matrix_metrics_exposure_http_basic_auth_enabled }}"
-matrix_bridge_mautrix_gvoice_container_labels_metrics_middleware_basic_auth_users: "{{ matrix_metrics_exposure_http_basic_auth_users }}"
-
 matrix_bridge_mautrix_gvoice_appservice_token: "{{ (matrix_homeserver_generic_secret_key + ':gvoice.as.token') | hash('sha512') | to_uuid }}"
 
 matrix_bridge_mautrix_gvoice_homeserver_address: "{{ matrix_addons_homeserver_client_api_url }}"
@@ -2353,12 +2282,6 @@ matrix_bridge_mautrix_gvoice_double_puppet_secrets_auto: |-
     else {}
   }}
 
-matrix_bridge_mautrix_gvoice_metrics_enabled: "{{ prometheus_enabled or matrix_metrics_exposure_enabled }}"
-
-matrix_bridge_mautrix_gvoice_metrics_proxying_enabled: "{{ matrix_bridge_mautrix_gvoice_metrics_enabled and matrix_metrics_exposure_enabled }}"
-matrix_bridge_mautrix_gvoice_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
-matrix_bridge_mautrix_gvoice_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/mautrix-gvoice"
-
 matrix_bridge_mautrix_gvoice_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
 matrix_bridge_mautrix_gvoice_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
 matrix_bridge_mautrix_gvoice_exposure_hostname: "{{ matrix_bridges_exposure_hostname }}"
@@ -2372,6 +2295,78 @@ matrix_bridge_mautrix_gvoice_database_password: "{{ (matrix_homeserver_generic_s
 ######################################################################
 #
 # /matrix-bridge-mautrix-gvoice
+#
+######################################################################
+
+######################################################################
+#
+# matrix-bridge-mautrix-linkedin
+#
+######################################################################
+
+# We don't enable bridges by default.
+matrix_bridge_mautrix_linkedin_enabled: false
+
+matrix_bridge_mautrix_linkedin_systemd_required_services_list_auto: |
+  {{
+    matrix_addons_homeserver_systemd_services_list
+    +
+    ([postgres_identifier ~ '.service'] if (postgres_enabled and matrix_bridge_mautrix_linkedin_database_hostname == postgres_connection_hostname) else [])
+  }}
+
+matrix_bridge_mautrix_linkedin_container_image_registry_prefix_upstream: "{{ matrix_container_global_registry_prefix_override if matrix_container_global_registry_prefix_override else matrix_bridge_mautrix_linkedin_container_image_registry_prefix_upstream_default }}"
+
+matrix_bridge_mautrix_linkedin_container_image_self_build: "{{ matrix_architecture not in ['arm64', 'amd64'] }}"
+
+matrix_bridge_mautrix_linkedin_container_network: "{{ matrix_addons_container_network }}"
+
+matrix_bridge_mautrix_linkedin_container_additional_networks_auto: |-
+  {{
+    (
+      ([] if matrix_addons_homeserver_container_network == '' else [matrix_addons_homeserver_container_network])
+      +
+      ([postgres_container_network] if (postgres_enabled and matrix_bridge_mautrix_linkedin_database_hostname == postgres_connection_hostname and matrix_bridge_mautrix_linkedin_container_network != postgres_container_network) else [])
+      +
+      ([matrix_playbook_reverse_proxyable_services_additional_network] if (matrix_playbook_reverse_proxyable_services_additional_network and matrix_bridge_mautrix_linkedin_container_labels_traefik_enabled) else [])
+    ) | unique
+  }}
+
+matrix_bridge_mautrix_linkedin_container_labels_traefik_enabled: "{{ matrix_playbook_reverse_proxy_type in ['playbook-managed-traefik', 'other-traefik-container'] }}"
+matrix_bridge_mautrix_linkedin_container_labels_traefik_docker_network: "{{ matrix_playbook_reverse_proxyable_services_additional_network }}"
+matrix_bridge_mautrix_linkedin_container_labels_traefik_entrypoints: "{{ traefik_entrypoint_primary }}"
+matrix_bridge_mautrix_linkedin_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
+
+matrix_bridge_mautrix_linkedin_appservice_token: "{{ (matrix_homeserver_generic_secret_key + ':linkedin.as.token') | hash('sha512') | to_uuid }}"
+
+matrix_bridge_mautrix_linkedin_homeserver_address: "{{ matrix_addons_homeserver_client_api_url }}"
+matrix_bridge_mautrix_linkedin_homeserver_token: "{{ (matrix_homeserver_generic_secret_key + ':linkedin.hs.token') | hash('sha512') | to_uuid }}"
+
+matrix_bridge_mautrix_linkedin_provisioning_shared_secret: "{{ (matrix_homeserver_generic_secret_key + ':linkedin.prov') | hash('sha512') | to_uuid }}"
+
+matrix_bridge_mautrix_linkedin_homeserver_async_media: "{{ matrix_homeserver_implementation in ['synapse'] }}"
+
+matrix_bridge_mautrix_linkedin_double_puppet_secrets_auto: |-
+  {{
+    {
+      matrix_bridge_mautrix_linkedin_homeserver_domain: ("as_token:" + matrix_appservice_double_puppet_registration_as_token)
+    }
+    if matrix_appservice_double_puppet_enabled
+    else {}
+  }}
+
+matrix_bridge_mautrix_linkedin_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
+matrix_bridge_mautrix_linkedin_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
+matrix_bridge_mautrix_linkedin_exposure_hostname: "{{ matrix_bridges_exposure_hostname }}"
+matrix_bridge_mautrix_linkedin_exposure_path_prefix: "{{ matrix_bridges_exposure_path_prefix }}/linkedin"
+
+# Postgres is the default, except if not using internal Postgres server
+matrix_bridge_mautrix_linkedin_database_engine: "{{ 'postgres' if postgres_enabled else 'sqlite' }}"
+matrix_bridge_mautrix_linkedin_database_hostname: "{{ postgres_connection_hostname if postgres_enabled else '' }}"
+matrix_bridge_mautrix_linkedin_database_password: "{{ (matrix_homeserver_generic_secret_key + ':mau.linkedin.db') | hash('sha512') | to_uuid }}"
+
+######################################################################
+#
+# /matrix-bridge-mautrix-linkedin
 #
 ######################################################################
 
@@ -2514,9 +2509,6 @@ matrix_bridge_mautrix_whatsapp_container_labels_traefik_docker_network: "{{ matr
 matrix_bridge_mautrix_whatsapp_container_labels_traefik_entrypoints: "{{ traefik_entrypoint_primary }}"
 matrix_bridge_mautrix_whatsapp_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
 
-matrix_bridge_mautrix_whatsapp_container_labels_metrics_middleware_basic_auth_enabled: "{{ matrix_metrics_exposure_http_basic_auth_enabled }}"
-matrix_bridge_mautrix_whatsapp_container_labels_metrics_middleware_basic_auth_users: "{{ matrix_metrics_exposure_http_basic_auth_users }}"
-
 matrix_bridge_mautrix_whatsapp_systemd_required_services_list_auto: |
   {{
     matrix_addons_homeserver_systemd_services_list
@@ -2540,12 +2532,6 @@ matrix_bridge_mautrix_whatsapp_double_puppet_secrets_auto: |-
     if matrix_appservice_double_puppet_enabled
     else {}
   }}
-
-matrix_bridge_mautrix_whatsapp_metrics_enabled: "{{ prometheus_enabled or matrix_metrics_exposure_enabled }}"
-
-matrix_bridge_mautrix_whatsapp_metrics_proxying_enabled: "{{ matrix_bridge_mautrix_whatsapp_metrics_enabled and matrix_metrics_exposure_enabled }}"
-matrix_bridge_mautrix_whatsapp_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
-matrix_bridge_mautrix_whatsapp_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/mautrix-whatsapp"
 
 matrix_bridge_mautrix_whatsapp_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
 matrix_bridge_mautrix_whatsapp_exposure_enabled: "{{ matrix_bridges_exposure_enabled }}"
@@ -2968,9 +2954,6 @@ matrix_bridge_steam_container_labels_traefik_docker_network: "{{ matrix_playbook
 matrix_bridge_steam_container_labels_traefik_entrypoints: "{{ traefik_entrypoint_primary }}"
 matrix_bridge_steam_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
 
-matrix_bridge_steam_container_labels_metrics_middleware_basic_auth_enabled: "{{ matrix_metrics_exposure_http_basic_auth_enabled }}"
-matrix_bridge_steam_container_labels_metrics_middleware_basic_auth_users: "{{ matrix_metrics_exposure_http_basic_auth_users }}"
-
 matrix_bridge_steam_appservice_token: "{{ (matrix_homeserver_generic_secret_key + ':steam.as.token') | hash('sha512') | to_uuid }}"
 
 matrix_bridge_steam_homeserver_address: "{{ matrix_addons_homeserver_client_api_url }}"
@@ -2990,12 +2973,6 @@ matrix_bridge_steam_double_puppet_secrets_auto: |-
     if matrix_appservice_double_puppet_enabled
     else {}
   }}
-
-matrix_bridge_steam_metrics_enabled: "{{ prometheus_enabled or matrix_metrics_exposure_enabled }}"
-
-matrix_bridge_steam_metrics_proxying_enabled: "{{ matrix_bridge_steam_metrics_enabled and matrix_metrics_exposure_enabled }}"
-matrix_bridge_steam_metrics_proxying_hostname: "{{ matrix_metrics_exposure_hostname }}"
-matrix_bridge_steam_metrics_proxying_path_prefix: "{{ matrix_metrics_exposure_path_prefix }}/matrix-steam-bridge"
 
 matrix_bridge_steam_database_hostname: "{{ postgres_connection_hostname if postgres_enabled else '' }}"
 matrix_bridge_steam_database_password: "{{ (matrix_homeserver_generic_secret_key + ':mau.twt.db') | hash('sha512') | to_uuid if postgres_enabled else '' }}"
@@ -3892,8 +3869,6 @@ jitsi_web_container_additional_networks_auto: |
 
 jitsi_jvb_container_image_registry_prefix_upstream: "{{ matrix_container_global_registry_prefix_override if matrix_container_global_registry_prefix_override else jitsi_jvb_container_image_registry_prefix_upstream_default }}"
 
-jitsi_jvb_container_colibri_ws_host_bind_port: "{{ (matrix_playbook_service_host_bind_interface_prefix ~ '13090') if matrix_playbook_service_host_bind_interface_prefix else '' }}"
-
 jitsi_jvb_container_additional_networks_auto: |
   {{
     ([matrix_playbook_reverse_proxyable_services_additional_network] if matrix_playbook_reverse_proxyable_services_additional_network else [])
@@ -4325,6 +4300,12 @@ postgres_managed_databases_auto: |
       'username': matrix_bridge_mautrix_gvoice_database_username,
       'password': matrix_bridge_mautrix_gvoice_database_password,
     }] if (matrix_bridge_mautrix_gvoice_enabled and matrix_bridge_mautrix_gvoice_database_engine == 'postgres' and matrix_bridge_mautrix_gvoice_database_hostname == postgres_connection_hostname) else [])
+    +
+    ([{
+      'name': matrix_bridge_mautrix_linkedin_database_name,
+      'username': matrix_bridge_mautrix_linkedin_database_username,
+      'password': matrix_bridge_mautrix_linkedin_database_password,
+    }] if (matrix_bridge_mautrix_linkedin_enabled and matrix_bridge_mautrix_linkedin_database_engine == 'postgres' and matrix_bridge_mautrix_linkedin_database_hostname == postgres_connection_hostname) else [])
     +
     ([{
       'name': matrix_bridge_mautrix_whatsapp_database_name,
@@ -5256,6 +5237,11 @@ matrix_ketesa_config_asManagedUsers_auto: |
     ] if matrix_bridge_mautrix_gvoice_enabled else [])
     +
     ([
+      '^@'+(matrix_bridge_mautrix_linkedin_appservice_bot_username | default('') | regex_escape)+':'+(matrix_domain | regex_escape)+'$',
+      '^@linkedin_[a-zA-Z0-9]+:'+(matrix_domain | regex_escape)+'$',
+    ] if matrix_bridge_mautrix_linkedin_enabled else [])
+    +
+    ([
       '^@'+(matrix_bridge_mautrix_googlechat_appservice_bot_username | default('') | regex_escape)+':'+(matrix_domain | regex_escape)+'$',
       '^@googlechat_[a-zA-Z0-9]+:'+(matrix_domain | regex_escape)+'$',
     ] if matrix_bridge_mautrix_googlechat_enabled else [])
@@ -6145,6 +6131,7 @@ matrix_static_files_file_matrix_mautrix_property_fi_mau_bridges_auto: |-
       matrix_bridge_mautrix_bluesky_appservice_public_address if (matrix_bridge_mautrix_bluesky_enabled and matrix_bridge_mautrix_bluesky_container_labels_traefik_enabled and matrix_bridge_mautrix_bluesky_container_labels_exposure_enabled) else '',
       matrix_bridge_mautrix_gmessages_bridge_public_address if (matrix_bridge_mautrix_gmessages_enabled and matrix_bridge_mautrix_gmessages_container_labels_traefik_enabled and matrix_bridge_mautrix_gmessages_container_labels_exposure_enabled) else '',
       matrix_bridge_mautrix_gvoice_bridge_public_address if (matrix_bridge_mautrix_gvoice_enabled and matrix_bridge_mautrix_gvoice_container_labels_traefik_enabled and matrix_bridge_mautrix_gvoice_container_labels_exposure_enabled) else '',
+      matrix_bridge_mautrix_linkedin_bridge_public_address if (matrix_bridge_mautrix_linkedin_enabled and matrix_bridge_mautrix_linkedin_container_labels_traefik_enabled and matrix_bridge_mautrix_linkedin_container_labels_exposure_enabled) else '',
       matrix_bridge_mautrix_meta_instagram_bridge_public_address if (matrix_bridge_mautrix_meta_instagram_enabled and matrix_bridge_mautrix_meta_instagram_container_labels_traefik_enabled and matrix_bridge_mautrix_meta_instagram_container_labels_exposure_enabled) else '',
       matrix_bridge_mautrix_meta_messenger_bridge_public_address if (matrix_bridge_mautrix_meta_messenger_enabled and matrix_bridge_mautrix_meta_messenger_container_labels_traefik_enabled and matrix_bridge_mautrix_meta_messenger_container_labels_exposure_enabled) else '',
       matrix_bridge_mautrix_signal_bridge_public_address if (matrix_bridge_mautrix_signal_enabled and matrix_bridge_mautrix_signal_container_labels_traefik_enabled and matrix_bridge_mautrix_signal_container_labels_exposure_enabled) else '',

@@ -148,6 +148,8 @@ Bridges can be used to connect your Matrix installation with third-party communi
 
 - [Setting up Mautrix Google Voice bridging](configuring-playbook-bridge-mautrix-gvoice.md)
 
+- [Setting up Mautrix LinkedIn bridging](configuring-playbook-bridge-mautrix-linkedin.md)
+
 - [Setting up Mautrix Whatsapp bridging](configuring-playbook-bridge-mautrix-whatsapp.md)
 
 - [Setting up Instagram bridging via Mautrix Meta](configuring-playbook-bridge-mautrix-meta-instagram.md)
@@ -167,8 +169,6 @@ Bridges can be used to connect your Matrix installation with third-party communi
 - [Setting up Appservice IRC bridging](configuring-playbook-bridge-appservice-irc.md)
 
 - [Setting up Appservice Discord bridging](configuring-playbook-bridge-appservice-discord.md)
-
-- [Setting up Beeper LinkedIn bridging](configuring-playbook-bridge-beeper-linkedin.md)
 
 - [Setting up Beeper LINE bridging](configuring-playbook-bridge-beeper-line.md)
 
@@ -270,6 +270,8 @@ Various services that don't fit any other categories.
 - [Setting up Appservice Slack bridging](configuring-playbook-bridge-appservice-slack.md) (removed; this component has been discontinued)
 
 - [Setting up Appservice Webhooks bridging](configuring-playbook-bridge-appservice-webhooks.md) (deprecated; the bridge's author suggests taking a look at [matrix-hookshot](https://github.com/matrix-org/matrix-hookshot) as a replacement, which can also be [installed using this playbook](configuring-playbook-bridge-hookshot.md))
+
+- [Setting up Beeper LinkedIn bridging](configuring-playbook-bridge-beeper-linkedin.md) (unmaintained; the [upstream repository](https://github.com/beeper/linkedin) has been archived. Consider [setting up Mautrix LinkedIn bridging](configuring-playbook-bridge-mautrix-linkedin.md))
 
 - [Setting up the Dimension integration manager](configuring-playbook-dimension.md) ([unmaintained](https://github.com/spantaleev/matrix-docker-ansible-deploy/issues/2806#issuecomment-1673559299); after [installing](installing.md))
 

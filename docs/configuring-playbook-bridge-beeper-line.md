@@ -36,7 +36,11 @@ matrix_bridge_beeper_line_enabled: true
 
 ### Using another container image
 
-The playbook uses `docker.io/crispyduck/beeper-line` by default. To use an image that you have built and published elsewhere, override the complete image name:
+Upstream does not publish container images publicly, as its CI only pushes them to Beeper's private registry. The playbook therefore uses [`docker.io/crispyduck/beeper-line`](https://hub.docker.com/r/crispyduck/beeper-line) by default, which is a community-maintained image built from the upstream source.
+
+That image is only available for the amd64 architecture. On other architectures, the playbook self-builds the image from source automatically.
+
+To use an image that you have built and published elsewhere, override the complete image name:
 
 ```yaml
 matrix_bridge_beeper_line_container_image_self_build: false
@@ -77,7 +81,7 @@ The shortcut commands with the [`just` program](just.md) are also available: `ju
 
 To use the bridge, start a chat with `@linebot:example.com` (where `example.com` is your base domain, not the `matrix.` domain).
 
-Send `login` and follow the prompts to enter your LINE email address and password and approve the new session in the LINE mobile app.
+Send `login` and enter your LINE email address and password when prompted. The bridge then shows you a PIN code, which you need to enter into the LINE app on your mobile device to approve the new session.
 
 ## Troubleshooting
 
