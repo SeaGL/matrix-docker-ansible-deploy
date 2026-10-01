@@ -17,7 +17,7 @@ matrix_bot_baibot_container_repo_version: "{{ 'main' if matrix_bot_baibot_versio
 matrix_bot_baibot_container_src_files_path: "{{ matrix_base_data_path }}/baibot/container-src"
 
 # renovate: datasource=docker depName=ghcr.io/etkecc/baibot
-matrix_bot_baibot_version: v1.25.0
+matrix_bot_baibot_version: v1.26.0
 matrix_bot_baibot_container_image: "{{ matrix_bot_baibot_container_image_registry_prefix }}etkecc/baibot:{{ matrix_bot_baibot_version }}"
 matrix_bot_baibot_container_image_registry_prefix: "{{ 'localhost/' if matrix_bot_baibot_container_image_self_build else matrix_bot_baibot_container_image_registry_prefix_upstream }}"
 matrix_bot_baibot_container_image_registry_prefix_upstream: "{{ matrix_bot_baibot_container_image_registry_prefix_upstream_default }}"
@@ -405,7 +405,9 @@ matrix_bot_baibot_config_agents_static_definitions_openai_config_extension_yaml:
 
 matrix_bot_baibot_config_agents_static_definitions_openai_config_base_url: https://api.openai.com/v1
 
-# The API key is intentionally not required. Some OpenAI-compatible APIs do not require a key.
+# Required when this provider is enabled.
+# For OpenAI-compatible APIs that need no key, baibot has a separate `openai_compat` provider,
+# which this role does not expose.
 matrix_bot_baibot_config_agents_static_definitions_openai_config_api_key: ""
 
 matrix_bot_baibot_config_agents_static_definitions_openai_config_text_generation_enabled: true
@@ -436,7 +438,7 @@ matrix_bot_baibot_config_agents_static_definitions_openai_config_text_to_speech_
 matrix_bot_baibot_config_agents_static_definitions_openai_config_text_to_speech_response_format: opus
 
 matrix_bot_baibot_config_agents_static_definitions_openai_config_image_generation_enabled: true
-matrix_bot_baibot_config_agents_static_definitions_openai_config_image_generation_model_id: gpt-image-1.5
+matrix_bot_baibot_config_agents_static_definitions_openai_config_image_generation_model_id: gpt-image-2.5-sunburst
 matrix_bot_baibot_config_agents_static_definitions_openai_config_image_generation_style: null
 matrix_bot_baibot_config_agents_static_definitions_openai_config_image_generation_size: null
 matrix_bot_baibot_config_agents_static_definitions_openai_config_image_generation_quality: null

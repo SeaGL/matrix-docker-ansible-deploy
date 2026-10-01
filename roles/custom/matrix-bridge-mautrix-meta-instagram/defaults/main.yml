@@ -18,7 +18,7 @@ matrix_bridge_mautrix_meta_instagram_enabled: true
 matrix_bridge_mautrix_meta_instagram_identifier: matrix-mautrix-meta-instagram
 
 # renovate: datasource=docker depName=dock.mau.dev/mautrix/meta
-matrix_bridge_mautrix_meta_instagram_version: v0.2608.0
+matrix_bridge_mautrix_meta_instagram_version: v0.2609.0
 
 matrix_bridge_mautrix_meta_instagram_base_path: "{{ matrix_base_data_path }}/mautrix-meta-instagram"
 matrix_bridge_mautrix_meta_instagram_config_path: "{{ matrix_bridge_mautrix_meta_instagram_base_path }}/config"
@@ -139,7 +139,7 @@ matrix_bridge_mautrix_meta_instagram_appservice_database_type: "{{ matrix_bridge
 matrix_bridge_mautrix_meta_instagram_appservice_database_uri: |-
   {{
     {
-      'sqlite3-fk-wal': ('sqlite:///' + matrix_bridge_mautrix_meta_instagram_sqlite_database_path_in_container),
+      'sqlite3-fk-wal': matrix_bridge_mautrix_meta_instagram_sqlite_database_path_in_container,
       'postgres': matrix_bridge_mautrix_meta_instagram_database_connection_string,
     }[matrix_bridge_mautrix_meta_instagram_database_engine]
   }}

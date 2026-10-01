@@ -299,6 +299,11 @@ matrix_bot_baibot_config_agents_static_definitions_openai_config_api_key: "YOUR_
 # See: https://github.com/etkecc/baibot/blob/61d18b2/docs/features.md#%EF%B8%8F-built-in-tools-openai-only
 # matrix_bot_baibot_config_agents_static_definitions_openai_config_text_generation_tools_web_search: true
 # matrix_bot_baibot_config_agents_static_definitions_openai_config_text_generation_tools_code_interpreter: true
+
+# Image generation and editing use GPT Image 2.5 Sunburst by default.
+# matrix_bot_baibot_config_agents_static_definitions_openai_config_image_generation_model_id: gpt-image-2.5-sunburst
+# Quality options: low, medium, high, xhigh, max, auto. null uses the model default.
+# matrix_bot_baibot_config_agents_static_definitions_openai_config_image_generation_quality: null
 ```
 
 Because this is a [statically](https://github.com/etkecc/baibot/blob/main/docs/configuration/README.md#static-configuration)-defined agent, it will be given a `static/` ID prefix and will be named `static/openai`.
