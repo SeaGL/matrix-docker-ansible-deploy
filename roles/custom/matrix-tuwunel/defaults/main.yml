@@ -13,7 +13,7 @@ matrix_tuwunel_enabled: true
 matrix_tuwunel_hostname: ''
 
 # renovate: datasource=docker depName=ghcr.io/matrix-construct/tuwunel
-matrix_tuwunel_version: v1.8.3
+matrix_tuwunel_version: v1.9.0
 
 matrix_tuwunel_container_image: "{{ matrix_tuwunel_container_image_registry_prefix }}matrix-construct/tuwunel:{{ matrix_tuwunel_container_image_tag }}"
 matrix_tuwunel_container_image_tag: "{{ matrix_tuwunel_version }}"
@@ -265,6 +265,12 @@ matrix_tuwunel_config_enable_policy_servers: false
 # signature-fetches against a room's policy server.
 matrix_tuwunel_config_policy_server_request_timeout: 5
 
+# Whether tuwunel evaluates MSC3664 related-event push conditions itself.
+# The default `.im.nheko.msc3664.reply` rule needs this to affect notification counts and pusher delivery.
+# Clients implementing MSC3664 evaluate the rule locally either way.
+# Enabling it costs an extra event lookup for every event carrying a relation.
+matrix_tuwunel_config_msc3664_related_event_match: false
+
 # Outgoing presence is heavy on CPU and network and almost no clients use it. Off by default.
 matrix_tuwunel_config_allow_outgoing_presence: false
 
@@ -331,7 +337,6 @@ matrix_tuwunel_config_ldap_bind_dn: ''
 matrix_tuwunel_config_ldap_bind_password_file: ''
 matrix_tuwunel_config_ldap_filter: '(objectClass=*)'
 matrix_tuwunel_config_ldap_uid_attribute: 'uid'
-matrix_tuwunel_config_ldap_name_attribute: 'givenName'
 matrix_tuwunel_config_ldap_admin_base_dn: ''
 matrix_tuwunel_config_ldap_admin_filter: ''
 

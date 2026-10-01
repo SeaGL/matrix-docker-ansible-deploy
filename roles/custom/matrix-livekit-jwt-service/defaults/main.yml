@@ -25,7 +25,7 @@ matrix_livekit_jwt_service_container_additional_networks_auto: []
 matrix_livekit_jwt_service_container_additional_networks_custom: []
 
 # renovate: datasource=docker depName=ghcr.io/element-hq/lk-jwt-service
-matrix_livekit_jwt_service_version: 0.5.0
+matrix_livekit_jwt_service_version: 0.6.0
 
 matrix_livekit_jwt_service_container_image_self_build: false
 matrix_livekit_jwt_service_container_repo: "https://github.com/element-hq/lk-jwt-service.git"
@@ -67,6 +67,22 @@ matrix_livekit_jwt_service_container_labels_additional_labels: ''
 # A list of extra arguments to pass to the container
 matrix_livekit_jwt_service_container_extra_arguments: []
 
+# Controls whether the container's built-in healthcheck is left enabled.
+#
+# lk-jwt-service v0.6.0 added a healthcheck which builds its URL as
+# `http://localhost:$LIVEKIT_JWT_BIND/healthz`, interpolating the bind address
+# into the port slot. Because LIVEKIT_JWT_BIND is a bind address (`:8080`), the
+# resulting URL is invalid and the check can never pass, leaving the container
+# permanently unhealthy. Traefik skips unhealthy containers, so the service
+# stops being routed and Element Call cannot obtain an SFU token.
+#
+# There is no way to correct the check from here: the image is built `FROM
+# scratch`, so it has no shell for a `--health-cmd` override to use.
+#
+# Re-enable this once upstream fixes the check.
+# See: https://github.com/element-hq/lk-jwt-service/pull/186
+matrix_livekit_jwt_service_container_healthcheck_enabled: false
+
 # Controls the port that the service listens on internally in the container.
 # This is still used for Traefik configuration and container port binding.
 matrix_livekit_jwt_service_container_port: 8080
@@ -100,6 +116,21 @@ matrix_livekit_jwt_service_environment_variable_livekit_full_access_homeservers_
 matrix_livekit_jwt_service_environment_variable_livekit_full_access_homeservers_list_default: ["{{ matrix_domain }}"]
 matrix_livekit_jwt_service_environment_variable_livekit_full_access_homeservers_list_auto: []
 matrix_livekit_jwt_service_environment_variable_livekit_full_access_homeservers_list_custom: []
+
+# Controls the LIVEKIT_CS_API_URL_OVERRIDES environment variable.
+#
+# To learn where a user's homeserver serves its Client-Server API, the service performs `.well-known` discovery.
+# That is, it requests `https://<server-name>/.well-known/matrix/client` over the network and reads `m.homeserver.base_url` out of it.
+# Entries listed here are consulted first, so that the server names they cover are resolved without discovery.
+#
+# Keys are Matrix server names and values are Client-Server API base URLs (including the scheme).
+# A playbook may inject an entry for the homeserver it manages, pointing the service at it directly.
+#
+# To add your own entries, use `matrix_livekit_jwt_service_environment_variable_livekit_cs_api_url_overrides_map_custom`.
+matrix_livekit_jwt_service_environment_variable_livekit_cs_api_url_overrides: "{{ matrix_livekit_jwt_service_environment_variable_livekit_cs_api_url_overrides_map.items() | map('join', '=') | join(',') }}"
+matrix_livekit_jwt_service_environment_variable_livekit_cs_api_url_overrides_map: "{{ matrix_livekit_jwt_service_environment_variable_livekit_cs_api_url_overrides_map_auto | combine(matrix_livekit_jwt_service_environment_variable_livekit_cs_api_url_overrides_map_custom) }}"
+matrix_livekit_jwt_service_environment_variable_livekit_cs_api_url_overrides_map_auto: {}
+matrix_livekit_jwt_service_environment_variable_livekit_cs_api_url_overrides_map_custom: {}
 
 # Additional environment variables to pass to the container.
 #
