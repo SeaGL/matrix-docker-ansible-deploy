@@ -42,7 +42,7 @@
   version: v11031-0
   name: jitsi
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-livekit-server.git
-  version: v1.13.3-3
+  version: v1.13.4-0
   name: livekit_server
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-ntfy.git
   version: v2.26.0-0
@@ -75,7 +75,7 @@
   version: v0.20.1-0
   name: prometheus_postgres_exporter
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-sable.git
-  version: v1.19.4-0
+  version: v1.20.0-0
   name: sable
 - src: git+https://github.com/devture/com.devture.ansible.role.systemd_docker_base.git
   version: v1.5.0-0
