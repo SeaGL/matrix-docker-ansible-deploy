@@ -22,7 +22,7 @@ matrix_authentication_service_container_repo_version: "{{ 'main' if matrix_authe
 matrix_authentication_service_container_src_files_path: "{{ matrix_base_data_path }}/matrix-authentication-service/container-src"
 
 # renovate: datasource=docker depName=ghcr.io/element-hq/matrix-authentication-service
-matrix_authentication_service_version: 1.12.0
+matrix_authentication_service_version: 1.13.0
 matrix_authentication_service_container_image_registry_prefix: "{{ 'localhost/' if matrix_authentication_service_container_image_self_build else matrix_authentication_service_container_image_registry_prefix_upstream }}"
 matrix_authentication_service_container_image_registry_prefix_upstream: "{{ matrix_authentication_service_container_image_registry_prefix_upstream_default }}"
 matrix_authentication_service_container_image_registry_prefix_upstream_default: "ghcr.io/"
@@ -612,6 +612,10 @@ matrix_authentication_service_syn2mas_migrate_dry_run: false
 matrix_authentication_service_syn2mas_synapse_homeserver_config_path: ""
 
 matrix_authentication_service_syn2mas_container_network: "{{ matrix_authentication_service_container_network }}"
+
+matrix_authentication_service_syn2mas_synapse_database_socket_enabled: false
+matrix_authentication_service_syn2mas_synapse_database_socket_path: ""
+matrix_authentication_service_syn2mas_synapse_database_socket_path_host: ""
 
 # Additional options passed to the syn2mas sub-command (e.g. `mas-cli syn2mas [OPTIONS] migrate|check`).
 # Also see: `matrix_authentication_service_syn2mas_subcommand_extra_options`
