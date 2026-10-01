@@ -32,9 +32,27 @@
 				"dock.mau.dev/mautrix/**"
 			],
 			"allowedVersions": "/^v0\\./"
+		},
+		{
+			"matchFileNames": [
+				".github/workflows/close-stale-issues.yml",
+				".github/workflows/lock-threads.yml",
+				".github/workflows/matrix.yml",
+				".github/workflows/update-translations.yml",
+				"flake.lock",
+				"i18n/requirements.txt",
+				"mise.toml"
+			],
+			"automerge": true
 		}
 	],
 	"pre-commit": {
 		"enabled": true
+	},
+	"nix": {
+		"enabled": true,
+		"lockFileMaintenance": {
+			"enabled": true
+		}
 	}
 }

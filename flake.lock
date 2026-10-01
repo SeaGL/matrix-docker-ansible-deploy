@@ -1,15 +1,31 @@
 {
   "nodes": {
+    "agru-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1783761807,
+        "narHash": "sha256-EVOf5r2oN2WpgodgTQmGJDPJVhgidIMz97hF6TgCyX8=",
+        "owner": "etkecc",
+        "repo": "agru",
+        "rev": "9e2ca9d8fa904db04e8d34bf0e7b54287e850298",
+        "type": "github"
+      },
+      "original": {
+        "owner": "etkecc",
+        "repo": "agru",
+        "type": "github"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
       },
       "locked": {
-        "lastModified": 1710146030,
-        "narHash": "sha256-SZ5L6eA7HJ/nmkzGG7/ISclqe6oZdOZTNoesiInkXPQ=",
+        "lastModified": 1731533236,
+        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "b1d9ab70662946ef0850d488da1c9019f3a9752a",
+        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
         "type": "github"
       },
       "original": {
@@ -20,21 +36,23 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1712578459,
-        "narHash": "sha256-r+rjtYIdwV7mEqFwbvaS7dZSH+3xNW9loR3Rh9C0ifI=",
+        "lastModified": 1783816212,
+        "narHash": "sha256-2aZisVTVGSFEk3MYcOiWQp3zvwyzbqpktB69Rcfp150=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "b1a486be09c354e25a18689eb21425e43892e38c",
+        "rev": "3b32825de172d0bc85664f495edb096b10862524",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
     },
     "root": {
       "inputs": {
+        "agru-src": "agru-src",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs"
       }

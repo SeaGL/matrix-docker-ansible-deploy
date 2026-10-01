@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: matrix-docker-ansible-deploy \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-29 17:11+0000\n"
+"POT-Creation-Date: 2026-07-12 15:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -288,11 +288,23 @@ msgstr ""
 msgid "[Link](docs/configuring-playbook-client-fluffychat-web.md)"
 msgstr ""
 
-#: ../../../README.md:72
+#: ../../../README.md:0
+msgid "[Commet](https://github.com/commetchat/commet)"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "Matrix web client"
+msgstr ""
+
+#: ../../../README.md:0
+msgid "[Link](docs/configuring-playbook-client-commet.md)"
+msgstr ""
+
+#: ../../../README.md:73
 msgid "Server Components"
 msgstr ""
 
-#: ../../../README.md:74
+#: ../../../README.md:75
 msgid "Services that run on the server to make the various parts of your installation work."
 msgstr ""
 
@@ -380,11 +392,11 @@ msgstr ""
 msgid "[Link](docs/configuring-playbook-matrix-rtc.md)"
 msgstr ""
 
-#: ../../../README.md:86
+#: ../../../README.md:87
 msgid "Authentication"
 msgstr ""
 
-#: ../../../README.md:88
+#: ../../../README.md:89
 msgid "Extend and modify how users are authenticated on your homeserver."
 msgstr ""
 
@@ -448,11 +460,11 @@ msgstr ""
 msgid "[Link](docs/configuring-playbook-synapse-simple-antispam.md)"
 msgstr ""
 
-#: ../../../README.md:98
+#: ../../../README.md:99
 msgid "File Storage"
 msgstr ""
 
-#: ../../../README.md:100
+#: ../../../README.md:101
 msgid "Use alternative file storage to the default `media_store` folder."
 msgstr ""
 
@@ -488,11 +500,11 @@ msgstr ""
 msgid "[Link](docs/configuring-playbook-matrix-media-repo.md)"
 msgstr ""
 
-#: ../../../README.md:108
+#: ../../../README.md:109
 msgid "Bridges"
 msgstr ""
 
-#: ../../../README.md:110
+#: ../../../README.md:111
 msgid "Bridges can be used to connect your Matrix installation with third-party communication networks."
 msgstr ""
 
@@ -796,11 +808,11 @@ msgstr ""
 msgid "[Link](docs/configuring-playbook-bridge-postmoogle.md)"
 msgstr ""
 
-#: ../../../README.md:140
+#: ../../../README.md:141
 msgid "Bots"
 msgstr ""
 
-#: ../../../README.md:142
+#: ../../../README.md:143
 msgid "Bots provide various additional functionality to your installation."
 msgstr ""
 
@@ -826,18 +838,6 @@ msgstr ""
 
 #: ../../../README.md:0
 msgid "[Link](docs/configuring-playbook-bot-matrix-reminder-bot.md)"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "[matrix-registration-bot](https://github.com/moan0s/matrix-registration-bot)"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "Bot for invitations by creating and managing registration tokens"
-msgstr ""
-
-#: ../../../README.md:0
-msgid "[Link](docs/configuring-playbook-bot-matrix-registration-bot.md)"
 msgstr ""
 
 #: ../../../README.md:0
