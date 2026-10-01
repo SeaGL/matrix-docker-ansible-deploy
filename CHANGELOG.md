@@ -1,4 +1,25 @@
+# 2026-02-06
+
+## The Sliding Sync proxy has been removed from the playbook
+
+The [Sliding Sync proxy](./docs/configuring-playbook-sliding-sync-proxy.md) has been removed from the playbook, as it's been replaced with a different method (called Simplified Sliding Sync) integrated to newer homeservers by default (**Conduit** homeserver from version `0.6.0` or **Synapse** from version `1.114`).
+
+The playbook will let you know if you're using any `matrix_sliding_sync_*` variables. You'll need to remove them from `vars.yml` and potentially [uninstall the proxy manually](./docs/configuring-playbook-sliding-sync-proxy.md#uninstalling-the-proxy-manually).
+
 # 2026-02-04
+
+## baibot now supports OpenAI's built-in tools (Web Search and Code Interpreter)
+
+**TLDR**: if you're using the [OpenAI provider](https://github.com/etkecc/baibot/blob/main/docs/providers.md#openai) with [baibot](docs/configuring-playbook-bot-baibot.md), you can now enable [built-in tools](https://github.com/etkecc/baibot/blob/61d18b2/docs/features.md#%EF%B8%8F-built-in-tools-openai-only) (`web_search` and `code_interpreter`) to extend the model's capabilities.
+
+These tools are **disabled by default** and can be enabled via Ansible variables for static agent configurations:
+
+```yaml
+matrix_bot_baibot_config_agents_static_definitions_openai_config_text_generation_tools_web_search: true
+matrix_bot_baibot_config_agents_static_definitions_openai_config_text_generation_tools_code_interpreter: true
+```
+
+Users who define agents dynamically at runtime will need to [update their agents](https://github.com/etkecc/baibot/blob/61d18b2/docs/agents.md#updating-agents) to enable these tools. See the [baibot v1.14.0 changelog](https://github.com/etkecc/baibot/blob/61d18b2/CHANGELOG.md) for details.
 
 ## Whoami-based sync worker routing for improved sticky sessions for Synapse
 
