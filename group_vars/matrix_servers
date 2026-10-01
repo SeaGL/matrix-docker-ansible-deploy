@@ -60,6 +60,31 @@ matrix_playbook_public_matrix_federation_api_traefik_entrypoint_config_http3_ena
 # and affects how services configure their public URLs.
 matrix_federation_traefik_entrypoint_tls: "{{ traefik_config_entrypoint_web_secure_enabled }}"
 
+# The public URLs of all playbook-managed Matrix client (web) applications which are enabled,
+# ordered by preference (that is: the same order that these clients are wired up in this file).
+matrix_playbook_public_client_urls: |
+  {{
+    ([matrix_client_element_scheme + '://' + matrix_client_element_hostname + matrix_client_element_path_prefix] if matrix_client_element_enabled else [])
+    +
+    ([matrix_client_commet_scheme + '://' + matrix_client_commet_hostname + matrix_client_commet_path_prefix] if matrix_client_commet_enabled else [])
+    +
+    ([hydrogen_scheme + '://' + hydrogen_hostname + hydrogen_path_prefix] if hydrogen_enabled else [])
+    +
+    ([cinny_scheme + '://' + cinny_hostname + cinny_path_prefix] if cinny_enabled else [])
+    +
+    ([sable_scheme + '://' + sable_hostname + sable_path_prefix] if sable_enabled else [])
+    +
+    ([matrix_client_schildichat_scheme + '://' + matrix_client_schildichat_hostname + matrix_client_schildichat_path_prefix] if matrix_client_schildichat_enabled else [])
+    +
+    ([matrix_client_fluffychat_scheme + '://' + matrix_client_fluffychat_hostname + matrix_client_fluffychat_path_prefix] if matrix_client_fluffychat_enabled else [])
+  }}
+
+# The URL that requests hitting the homeserver's root path (`/`) are redirected to.
+#
+# It points to the most-preferred playbook-managed client (see `matrix_playbook_public_client_urls`),
+# or is empty (no redirection) if no such client is enabled.
+matrix_playbook_public_client_root_redirection_url: "{{ matrix_playbook_public_client_urls | first | default('', true) }}"
+
 ########################################################################
 #                                                                      #
 # /Playbook                                                            #
@@ -3401,6 +3426,12 @@ matrix_bot_meowlnir_container_additional_networks_auto: |-
 matrix_bot_meowlnir_config_homeserver_address: "{{ matrix_addons_homeserver_client_api_url }}"
 matrix_bot_meowlnir_config_homeserver_domain: "{{ matrix_domain }}"
 
+# Provisioning bots (`ensure-matrix-users-created`) requires the homeserver to accept Meowlnir's appservice registration, which it only reads on startup.
+# On the run which first enables Meowlnir, the homeserver is still running without it, so the role restarts these services to load it.
+# Restarting the main service suffices even with Synapse workers, because their units declare `Requires=matrix-synapse.service` and systemd propagates the restart to them.
+# Left empty for homeserver implementations whose appservice registrations the playbook does not manage (Conduit and its forks), where registration is a manual step anyway.
+matrix_bot_meowlnir_homeserver_restart_systemd_services_list: "{{ ['matrix-' ~ matrix_homeserver_implementation ~ '.service'] if matrix_homeserver_implementation in ['synapse', 'dendrite'] else [] }}"
+
 # Only consulted by bots configured with `management_room_auto_create`, and only as the
 # default for those which do not carry their own `initial_managers` list.
 # May legitimately be empty, in which case such bots fail validation and ask to be told who
@@ -4718,6 +4749,8 @@ matrix_client_element_element_call_url: "{{ matrix_element_call_public_url if ma
 
 matrix_client_commet_enabled: false
 
+matrix_client_commet_scheme: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}"
+
 matrix_client_commet_hostname: "commet.{{ matrix_domain }}"
 
 matrix_client_commet_container_http_host_bind_port: "{{ (matrix_playbook_service_host_bind_interface_prefix ~ '8766') if matrix_playbook_service_host_bind_interface_prefix else '' }}"
@@ -5026,7 +5059,7 @@ matrix_synapse_container_labels_traefik_compression_middleware_name: "{{ matrix_
 matrix_synapse_container_labels_matrix_labels_enabled: "{{ not matrix_synapse_workers_enabled }}"
 
 matrix_synapse_container_labels_public_client_root_redirection_enabled: "{{ matrix_synapse_container_labels_public_client_root_redirection_url != '' }}"
-matrix_synapse_container_labels_public_client_root_redirection_url: "{{ (('https://' if matrix_playbook_ssl_enabled else 'http://') + matrix_server_fqn_element) if matrix_client_element_enabled else '' }}"
+matrix_synapse_container_labels_public_client_root_redirection_url: "{{ matrix_playbook_public_client_root_redirection_url }}"
 
 matrix_synapse_container_labels_public_client_synapse_admin_api_enabled: "{{ matrix_ketesa_enabled or matrix_element_admin_enabled }}"
 matrix_synapse_container_labels_internal_client_synapse_admin_api_enabled: "{{ (matrix_bot_draupnir_enabled and matrix_bot_draupnir_admin_api_enabled) }}"
@@ -5134,9 +5167,21 @@ matrix_synapse_ext_synapse_http_antispam_config_enabled_callbacks: "{{ matrix_bo
 matrix_synapse_ext_synapse_http_antispam_config_fail_open: "{{ matrix_bot_draupnir_synapse_http_antispam_config_fail_open if matrix_bot_draupnir_config_web_synapseHTTPAntispam_enabled else (matrix_bot_meowlnir_synapse_http_antispam_config_fail_open if matrix_bot_meowlnir_synapse_http_antispam_enabled else {}) }}"
 matrix_synapse_ext_synapse_http_antispam_config_async: "{{ matrix_bot_draupnir_synapse_http_antispam_config_async if matrix_bot_draupnir_config_web_synapseHTTPAntispam_enabled else (matrix_bot_meowlnir_synapse_http_antispam_config_async if matrix_bot_meowlnir_synapse_http_antispam_enabled else {}) }}"
 
-# Meowlnir's bots need these to support end-to-end encryption.
-matrix_synapse_experimental_features_msc2409_to_device_messages_enabled: "{{ matrix_bot_meowlnir_enabled and matrix_bot_meowlnir_config_encryption_enable }}"
-matrix_synapse_experimental_features_msc3202_transaction_extensions_enabled: "{{ matrix_bot_meowlnir_enabled and matrix_bot_meowlnir_config_encryption_enable }}"
+# Meowlnir's bots and Hookshot need these to support end-to-end encryption.
+# Synapse only sends the extra data to appservices which ask for it in their registration file,
+# so enabling these affects no other component.
+matrix_synapse_experimental_features_msc2409_to_device_messages_enabled: |-
+  {{
+    (matrix_bot_meowlnir_enabled and matrix_bot_meowlnir_config_encryption_enable)
+    or
+    (matrix_bridge_hookshot_enabled and matrix_bridge_hookshot_encryption_enabled)
+  }}
+matrix_synapse_experimental_features_msc3202_transaction_extensions_enabled: |-
+  {{
+    (matrix_bot_meowlnir_enabled and matrix_bot_meowlnir_config_encryption_enable)
+    or
+    (matrix_bridge_hookshot_enabled and matrix_bridge_hookshot_encryption_enabled)
+  }}
 
 # Enable Synapse statistics reporting when using synapse-usage-exporter
 matrix_synapse_report_stats: "{{ matrix_synapse_usage_exporter_enabled }}"
@@ -5150,7 +5195,7 @@ matrix_synapse_experimental_features_msc4108_enabled: "{{ matrix_authentication_
 
 matrix_synapse_delayed_events_enabled: "{{ matrix_rtc_enabled }}"
 
-matrix_synapse_experimental_features_msc4143_enabled: "{{ matrix_rtc_enabled }}"
+matrix_synapse_matrix_rtc_transports_livekit_url: "{{ matrix_livekit_jwt_service_public_url if matrix_livekit_jwt_service_enabled else '' }}"
 
 matrix_synapse_experimental_features_msc4222_enabled: "{{ matrix_rtc_enabled }}"
 
@@ -5853,7 +5898,7 @@ matrix_dendrite_container_labels_traefik_tls_certResolver: "{{ traefik_certResol
 matrix_dendrite_container_labels_public_client_synapse_admin_api_enabled: "{{ matrix_ketesa_enabled }}"
 
 matrix_dendrite_container_labels_public_client_root_redirection_enabled: "{{ matrix_dendrite_container_labels_public_client_root_redirection_url != '' }}"
-matrix_dendrite_container_labels_public_client_root_redirection_url: "{{ (('https://' if matrix_playbook_ssl_enabled else 'http://') + matrix_server_fqn_element) if matrix_client_element_enabled else '' }}"
+matrix_dendrite_container_labels_public_client_root_redirection_url: "{{ matrix_playbook_public_client_root_redirection_url }}"
 
 matrix_dendrite_container_labels_public_federation_api_traefik_hostname: "{{ matrix_server_fqn_matrix_federation }}"
 matrix_dendrite_container_labels_public_federation_api_traefik_entrypoints: "{{ matrix_federation_traefik_entrypoint_name }}"
@@ -5936,7 +5981,7 @@ matrix_conduit_container_labels_traefik_entrypoints: "{{ traefik_entrypoint_prim
 matrix_conduit_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
 
 matrix_conduit_container_labels_public_client_root_redirection_enabled: "{{ matrix_conduit_container_labels_public_client_root_redirection_url != '' }}"
-matrix_conduit_container_labels_public_client_root_redirection_url: "{{ (('https://' if matrix_playbook_ssl_enabled else 'http://') + matrix_server_fqn_element) if matrix_client_element_enabled else '' }}"
+matrix_conduit_container_labels_public_client_root_redirection_url: "{{ matrix_playbook_public_client_root_redirection_url }}"
 
 matrix_conduit_container_labels_public_federation_api_traefik_hostname: "{{ matrix_server_fqn_matrix_federation }}"
 matrix_conduit_container_labels_public_federation_api_traefik_entrypoints: "{{ matrix_federation_traefik_entrypoint_name }}"
@@ -5994,7 +6039,7 @@ matrix_continuwuity_container_labels_traefik_entrypoints: "{{ traefik_entrypoint
 matrix_continuwuity_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
 
 matrix_continuwuity_container_labels_public_client_root_redirection_enabled: "{{ matrix_continuwuity_container_labels_public_client_root_redirection_url != '' }}"
-matrix_continuwuity_container_labels_public_client_root_redirection_url: "{{ (('https://' if matrix_playbook_ssl_enabled else 'http://') + matrix_server_fqn_element) if matrix_client_element_enabled else '' }}"
+matrix_continuwuity_container_labels_public_client_root_redirection_url: "{{ matrix_playbook_public_client_root_redirection_url }}"
 
 matrix_continuwuity_container_labels_public_federation_api_traefik_hostname: "{{ matrix_server_fqn_matrix_federation }}"
 matrix_continuwuity_container_labels_public_federation_api_traefik_entrypoints: "{{ matrix_federation_traefik_entrypoint_name }}"
@@ -6055,7 +6100,7 @@ matrix_tuwunel_container_labels_traefik_entrypoints: "{{ traefik_entrypoint_prim
 matrix_tuwunel_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
 
 matrix_tuwunel_container_labels_public_client_root_redirection_enabled: "{{ matrix_tuwunel_container_labels_public_client_root_redirection_url != '' }}"
-matrix_tuwunel_container_labels_public_client_root_redirection_url: "{{ (('https://' if matrix_playbook_ssl_enabled else 'http://') + matrix_server_fqn_element) if matrix_client_element_enabled else '' }}"
+matrix_tuwunel_container_labels_public_client_root_redirection_url: "{{ matrix_playbook_public_client_root_redirection_url }}"
 
 matrix_tuwunel_container_labels_public_client_synapse_admin_api_enabled: "{{ matrix_ketesa_enabled or matrix_element_admin_enabled }}"
 matrix_tuwunel_container_labels_internal_client_synapse_admin_api_enabled: "{{ (matrix_bot_draupnir_enabled and matrix_bot_draupnir_admin_api_enabled) }}"
@@ -6240,14 +6285,6 @@ matrix_static_files_file_matrix_client_property_m_tile_server_map_style_url: "{{
 
 # We set this regardless of whether Ketesa is enabled, because people may wish to use a hosted (externally) Ketesa installation and still have it auto-configured.
 matrix_static_files_file_matrix_client_property_cc_etke_ketesa_auto: "{{ matrix_ketesa_configuration if matrix_homeserver_implementation == 'synapse' else {} }}"
-
-matrix_static_files_file_matrix_client_property_org_matrix_msc4143_rtc_foci_enabled: "{{ matrix_livekit_jwt_service_enabled }}"
-matrix_static_files_file_matrix_client_property_org_matrix_msc4143_rtc_foci_auto: |-
-  {{
-    (
-      [{'type': 'livekit', 'livekit_service_url': matrix_livekit_jwt_service_public_url}] if matrix_livekit_jwt_service_enabled else []
-    )
-  }}
 
 # Advertise all enabled and exposed mautrix bridges for auto-discovery by tools like Mautrix Manager.
 # A bridge's public address is only reachable when the playbook attaches its Traefik labels and emits the exposure router,

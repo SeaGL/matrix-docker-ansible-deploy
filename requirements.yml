@@ -4,7 +4,7 @@
   version: v1.0.0-7
   name: auxiliary
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-backup_borg.git
-  version: v1.4.5-2.1.6-0
+  version: v1.4.5-2.1.7-0
   name: backup_borg
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-cinny.git
   version: v4.12.6-0
@@ -39,7 +39,7 @@
   version: v0.5.1-5
   name: hydrogen
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-jitsi.git
-  version: v11146-1-1
+  version: v11146-1-2
   name: jitsi
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-livekit-server.git
   version: v1.13.5-0
@@ -57,13 +57,13 @@
   version: dd6e15246b7a9a2d921e0b3f9cd8a4a917a1bb2f
   name: playbook_state_preserver
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-postgres.git
-  version: v18.4-2
+  version: v18.6-0
   name: postgres
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-postgres-backup.git
   version: v18-3
   name: postgres_backup
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-prometheus.git
-  version: v3.13.2-0
+  version: v3.14.0-0
   name: prometheus
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-prometheus-nginxlog-exporter.git
   version: v1.10.0-5
@@ -75,7 +75,7 @@
   version: v0.20.1-0
   name: prometheus_postgres_exporter
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-sable.git
-  version: v1.20.0-0
+  version: v1.21.0-0
   name: sable
 - src: git+https://github.com/devture/com.devture.ansible.role.systemd_docker_base.git
   version: v1.5.0-0

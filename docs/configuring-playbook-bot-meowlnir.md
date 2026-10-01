@@ -275,6 +275,8 @@ With `management_room_auto_create`, you then have an invitation waiting for you 
 
 - Re-running is safe and idempotent, so adding a bot later is a matter of extending the list and running the same command again.
 
+- If the homeserver turns out to be running without Meowlnir's appservice registration (which is the normal state of affairs on the run that first enables Meowlnir), the playbook restarts the homeserver during bot provisioning, so that everything completes in a single run.
+
 - The shortcut commands with the [`just` program](just.md) are also available: `just install-all` or `just setup-all`
 
 ## Usage
@@ -296,6 +298,10 @@ The playbook drives Meowlnir's management API for you based on `matrix_bot_meowl
 
 # Create another management room for an existing bot, with the given users able to command it there
 /matrix/meowlnir/bin/meowlnir-create-management-room meowlnir_bot @alice:example.com
+
+# Ask the homeserver who Meowlnir's appservice token belongs to.
+# A 401 response means the homeserver is running without Meowlnir's appservice registration, which is also what Meowlnir's own "Failed to connect to homeserver" log messages usually mean.
+/matrix/meowlnir/bin/meowlnir-whoami
 ```
 
 `meowlnir-create-management-room` prints the new room's ID, which you then register with `meowlnir-api PUT /_meowlnir/v1/management_room/<room ID>`.
