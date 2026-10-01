@@ -2987,7 +2987,7 @@ background_updates:
     #default_batch_size: 50
 
 
-{% if matrix_synapse_matrix_authentication_service_enabled %}
+{% if matrix_synapse_matrix_authentication_service_enabled and not matrix_authentication_service_migration_in_progress %}
 matrix_authentication_service:
   enabled: true
   endpoint: {{ matrix_synapse_matrix_authentication_service_endpoint | to_json }}
@@ -3009,6 +3009,9 @@ experimental_features:
   {% endif %}
   {% if matrix_synapse_experimental_features_msc4140_enabled %}
   msc4140_enabled: true
+  {% endif %}
+  {% if matrix_synapse_experimental_features_msc4143_enabled %}
+  msc4143_enabled: true
   {% endif %}
   {% if matrix_synapse_experimental_features_msc4222_enabled %}
   msc4222_enabled: true

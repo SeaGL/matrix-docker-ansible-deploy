@@ -24,9 +24,17 @@ repos:
     hooks:
       - id: reuse
   - repo: https://github.com/ansible/ansible-lint
-    rev: v26.3.0
+    rev: v26.4.0
     hooks:
       - id: ansible-lint
         files: '^roles/custom/'
         args: ['roles/custom']
+        pass_filenames: false
+  - repo: local
+    hooks:
+      - id: check-examples-vars-migration-version
+        name: Check examples/vars.yml migration version matches expected
+        entry: bin/check-examples-vars-migration-version.sh
+        language: script
+        files: '(examples/vars\.yml|roles/custom/matrix_playbook_migration/defaults/main\.yml)'
         pass_filenames: false
