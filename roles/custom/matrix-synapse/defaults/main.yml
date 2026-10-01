@@ -16,7 +16,7 @@ matrix_synapse_enabled: true
 matrix_synapse_github_org_and_repo: element-hq/synapse
 
 # renovate: datasource=docker depName=ghcr.io/element-hq/synapse
-matrix_synapse_version: v1.152.0
+matrix_synapse_version: v1.152.1
 
 matrix_synapse_username: ''
 matrix_synapse_uid: ''
@@ -1616,7 +1616,7 @@ matrix_synapse_ext_encryption_config_yaml: |
 # Enabling this will enable customizations and inject the appropriate Dockerfile clauses for installing synapse-s3-storage-provider.
 matrix_synapse_ext_synapse_s3_storage_provider_enabled: false
 # renovate: datasource=github-releases depName=matrix-org/synapse-s3-storage-provider
-matrix_synapse_ext_synapse_s3_storage_provider_version: 1.6.0
+matrix_synapse_ext_synapse_s3_storage_provider_version: 1.6.1
 # Controls whether media from this (local) server is stored in s3-storage-provider
 matrix_synapse_ext_synapse_s3_storage_provider_store_local: true
 # Controls whether media from remote servers is stored in s3-storage-provider
@@ -1847,7 +1847,7 @@ matrix_synapse_register_user_script_matrix_authentication_service_path: ""
 matrix_synapse_reverse_proxy_companion_enabled: "{{ matrix_synapse_enabled and matrix_synapse_workers_enabled }}"
 
 # renovate: datasource=docker depName=nginx
-matrix_synapse_reverse_proxy_companion_version: 1.30.0-alpine
+matrix_synapse_reverse_proxy_companion_version: 1.31.0-alpine
 
 matrix_synapse_reverse_proxy_companion_base_path: "{{ matrix_synapse_base_path }}/reverse-proxy-companion"
 matrix_synapse_reverse_proxy_companion_confd_path: "{{ matrix_synapse_reverse_proxy_companion_base_path }}/conf.d"

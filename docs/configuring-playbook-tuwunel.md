@@ -166,7 +166,14 @@ matrix_tuwunel_config_prevent_media_downloads_from:
   - 'heavy\.example\.com$'
 ```
 
-Tuwunel additionally implements [MSC4284 policy servers](https://github.com/matrix-org/matrix-spec-proposals/pull/4284) for room-level federation gating; that lives in room state and needs no playbook configuration.
+Tuwunel additionally implements [MSC4284 policy servers](https://github.com/matrix-org/matrix-spec-proposals/pull/4284) for room-level federation gating. The policy itself lives in room state, but enforcement is opt-in at the server level:
+
+```yaml
+matrix_tuwunel_config_enable_policy_servers: true
+matrix_tuwunel_config_policy_server_request_timeout: 5
+```
+
+When enabled, rooms with a valid `m.room.policy` state event have outgoing events signed by the configured policy server before federation. Transient network or timeout failures fail open (with a warn log), so a policy-server outage will not silently take the room offline.
 
 ### Default room version
 

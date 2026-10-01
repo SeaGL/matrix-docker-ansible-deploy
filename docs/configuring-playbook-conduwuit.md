@@ -31,7 +31,7 @@ systemctl disable --now matrix-conduwuit.service
 
 ## Migrating to Tuwunel
 
-[Tuwunel](configuring-playbook-tuwunel.md) is a fork of conduwuit which reads its database directly, so migration is possible. Please refer to [this section](./configuring-playbook-tuwunel.md#migrating-from-conduwuit) for details.
+[Tuwunel](configuring-playbook-tuwunel.md) is a fork of conduwuit, [endorsed as conduwuit's successor](https://github.com/spantaleev/matrix-docker-ansible-deploy/pull/5200#issuecomment-4396211185) by the former conduwuit maintainer. It reads conduwuit's database directly, so migration is possible. Please refer to [this section](./configuring-playbook-tuwunel.md#migrating-from-conduwuit) for details.
 
 ## Migrating to Continuwuity
 

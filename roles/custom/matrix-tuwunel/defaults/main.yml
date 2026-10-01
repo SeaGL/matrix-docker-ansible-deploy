@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: 2026 MDAD project contributors
-# SPDX-FileCopyrightText: 2026 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2025 - 2026 MDAD project contributors
+# SPDX-FileCopyrightText: 2025 - 2026 Slavi Pantaleev
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -13,7 +13,7 @@ matrix_tuwunel_enabled: true
 matrix_tuwunel_hostname: ''
 
 # renovate: datasource=docker depName=ghcr.io/matrix-construct/tuwunel
-matrix_tuwunel_version: v1.6.1
+matrix_tuwunel_version: v1.6.2
 
 matrix_tuwunel_container_image: "{{ matrix_tuwunel_container_image_registry_prefix }}matrix-construct/tuwunel:{{ matrix_tuwunel_container_image_tag }}"
 matrix_tuwunel_container_image_tag: "{{ matrix_tuwunel_version }}"
@@ -176,6 +176,18 @@ matrix_tuwunel_config_allowed_remote_server_names: []
 matrix_tuwunel_config_forbidden_remote_server_names: []
 matrix_tuwunel_config_forbidden_remote_room_directory_server_names: []
 matrix_tuwunel_config_prevent_media_downloads_from: []
+
+# MSC4284 policy server enforcement.
+# When enabled, rooms with a valid `m.room.policy` state event will have
+# outgoing events signed by the configured policy server before federation.
+# Refusal aborts the local request; transient network or timeout failures
+# fail open with a warn log so a policy-server outage does not silently
+# take the room offline.
+matrix_tuwunel_config_enable_policy_servers: false
+
+# Timeout (in seconds) for outbound `/sign` calls and inbound
+# signature-fetches against a room's policy server.
+matrix_tuwunel_config_policy_server_request_timeout: 5
 
 # Outgoing presence is heavy on CPU and network and almost no clients use it. Off by default.
 matrix_tuwunel_config_allow_outgoing_presence: false

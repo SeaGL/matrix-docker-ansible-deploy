@@ -1,6 +1,6 @@
 {#
-SPDX-FileCopyrightText: 2026 MDAD project contributors
-SPDX-FileCopyrightText: 2026 Slavi Pantaleev
+SPDX-FileCopyrightText: 2025 - 2026 MDAD project contributors
+SPDX-FileCopyrightText: 2025 - 2026 Slavi Pantaleev
 
 SPDX-License-Identifier: AGPL-3.0-or-later
 #}
@@ -56,6 +56,9 @@ forbidden_remote_room_directory_server_names = {{ matrix_tuwunel_config_forbidde
 {% if matrix_tuwunel_config_prevent_media_downloads_from | length > 0 %}
 prevent_media_downloads_from = {{ matrix_tuwunel_config_prevent_media_downloads_from | to_json }}
 {% endif %}
+
+enable_policy_servers = {{ matrix_tuwunel_config_enable_policy_servers | to_json }}
+policy_server_request_timeout = {{ matrix_tuwunel_config_policy_server_request_timeout }}
 
 allow_outgoing_presence = {{ matrix_tuwunel_config_allow_outgoing_presence | to_json }}
 
