@@ -21,12 +21,12 @@ To enable the bridge, add the following configuration to your `inventory/host_va
 
 ```yaml
 # Replace SERVICENAME with one of: twitter, discord, signal, googlechat, etc.
-matrix_mautrix_SERVICENAME_enabled: true
+matrix_bridge_mautrix_SERVICENAME_enabled: true
 ```
 
-**Note**: for bridging to Meta's Messenger or Instagram, you would need to add `meta` with an underscore symbol (`_`) or hyphen (`-`) based on the context as prefix to each `SERVICENAME`; add `_` to variables (as in `matrix_mautrix_meta_messenger_configuration_extension_yaml` for example) and `-` to paths of the configuration files (as in `roles/custom/matrix-bridge-mautrix-meta-messenger/templates/config.yaml.j2`), respectively.
+**Note**: for bridging to Meta's Messenger or Instagram, you would need to add `meta` with an underscore symbol (`_`) or hyphen (`-`) based on the context as prefix to each `SERVICENAME`; add `_` to variables (as in `matrix_bridge_mautrix_meta_messenger_configuration_extension_yaml` for example) and `-` to paths of the configuration files (as in `roles/custom/matrix-bridge-mautrix-meta-messenger/templates/config.yaml.j2`), respectively.
 
-There are some additional things you may wish to configure about the bridge before you continue. Each bridge may have additional requirements besides `_enabled: true`. For example, the mautrix-telegram bridge (our documentation page about it is [here](configuring-playbook-bridge-mautrix-telegram.md)) requires the `matrix_mautrix_telegram_api_id` and `matrix_mautrix_telegram_api_hash` variables to be defined. Refer to each bridge's individual documentation page for details about enabling bridges.
+There are some additional things you may wish to configure about the bridge before you continue. Each bridge may have additional requirements besides `_enabled: true`. For example, the mautrix-telegram bridge (our documentation page about it is [here](configuring-playbook-bridge-mautrix-telegram.md)) requires the `matrix_bridge_mautrix_telegram_api_id` and `matrix_bridge_mautrix_telegram_api_hash` variables to be defined. Refer to each bridge's individual documentation page for details about enabling bridges.
 
 ### Configure bridge permissions (optional)
 
@@ -43,7 +43,7 @@ If you don't define the `matrix_admin` in your configuration (e.g. `matrix_admin
 **Alternatively** (more verbose, but allows multiple admins to be configured), you can do the same on a per-bridge basis with:
 
 ```yaml
-matrix_mautrix_SERVICENAME_configuration_extension_yaml: |
+matrix_bridge_mautrix_SERVICENAME_configuration_extension_yaml: |
   bridge:
     permissions:
       '@alice:{{ matrix_domain }}': admin
@@ -67,8 +67,8 @@ matrix_bridges_encryption_default: true
 **Alternatively**, for a specific bridge:
 
 ```yaml
-matrix_mautrix_SERVICENAME_bridge_encryption_enabled: true
-matrix_mautrix_SERVICENAME_bridge_encryption_default: true
+matrix_bridge_mautrix_SERVICENAME_bridge_encryption_enabled: true
+matrix_bridge_mautrix_SERVICENAME_bridge_encryption_default: true
 ```
 
 ### Enable relay mode (optional)
@@ -86,16 +86,16 @@ matrix_bridges_relay_enabled: true
 **Alternatively**, for a specific bridge:
 
 ```yaml
-matrix_mautrix_SERVICENAME_configuration_extension_yaml: |
+matrix_bridge_mautrix_SERVICENAME_configuration_extension_yaml: |
   bridge:
     relay:
       enabled: true
 ```
 
-You can only have one `matrix_mautrix_SERVICENAME_configuration_extension_yaml` definition in `vars.yml` per bridge, so if you need multiple pieces of configuration there, just merge them like this:
+You can only have one `matrix_bridge_mautrix_SERVICENAME_configuration_extension_yaml` definition in `vars.yml` per bridge, so if you need multiple pieces of configuration there, just merge them like this:
 
 ```yaml
-matrix_mautrix_SERVICENAME_configuration_extension_yaml: |
+matrix_bridge_mautrix_SERVICENAME_configuration_extension_yaml: |
   bridge:
     relay:
       enabled: true
@@ -115,7 +115,7 @@ Use `!prefix set-pl 100` to be able for the bot to modify room settings and invi
 By default, only admins are allowed to set themselves as relay users. To allow anyone on your homeserver to set themselves as relay users, add the following configuration to your `vars.yml` file:
 
 ```yaml
-matrix_mautrix_SERVICENAME_bridge_relay_admin_only: false
+matrix_bridge_mautrix_SERVICENAME_bridge_relay_admin_only: false
 ```
 
 ### Set the bot's username (optional)
@@ -123,7 +123,7 @@ matrix_mautrix_SERVICENAME_bridge_relay_admin_only: false
 To set the bot's username, add the following configuration to your `vars.yml` file:
 
 ```yaml
-matrix_mautrix_SERVICENAME_appservice_bot_username: "BOTNAME"
+matrix_bridge_mautrix_SERVICENAME_appservice_bot_username: "BOTNAME"
 ```
 
 ### Configure the logging level (optional)
@@ -131,7 +131,7 @@ matrix_mautrix_SERVICENAME_appservice_bot_username: "BOTNAME"
 To specify the logging level, add the following configuration to your `vars.yml` file:
 
 ```yaml
-matrix_mautrix_SERVICENAME_logging_level: warn
+matrix_bridge_mautrix_SERVICENAME_logging_level: warn
 ```
 
 Replace `warn` with one of the following to control the verbosity of the logs generated: `trace`, `debug`, `info`, `warn`, `error` or `fatal`.
@@ -155,7 +155,7 @@ matrix_bridges_exposure_enabled: false
 **Alternatively**, to disable it for a specific bridge:
 
 ```yaml
-matrix_mautrix_SERVICENAME_exposure_enabled: false
+matrix_bridge_mautrix_SERVICENAME_exposure_enabled: false
 ```
 
 If you run additional bridges on the same server which are not managed by this playbook and would like compatible tools to discover them as well, you can advertise their base URLs in the `/.well-known/matrix/mautrix` file:
@@ -174,7 +174,7 @@ There are some additional things you may wish to configure about the bridge.
 Take a look at:
 
 - `roles/custom/matrix-bridge-mautrix-SERVICENAME/defaults/main.yml` for some variables that you can customize via your `vars.yml` file
-- `roles/custom/matrix-bridge-mautrix-SERVICENAME/templates/config.yaml.j2` for the bridge's default configuration. You can override settings (even those that don't have dedicated playbook variables) using the `matrix_mautrix_SERVICENAME_configuration_extension_yaml` variable
+- `roles/custom/matrix-bridge-mautrix-SERVICENAME/templates/config.yaml.j2` for the bridge's default configuration. You can override settings (even those that don't have dedicated playbook variables) using the `matrix_bridge_mautrix_SERVICENAME_configuration_extension_yaml` variable
 
 ## Installing
 
@@ -226,7 +226,7 @@ This is the recommended way of setting up Double Puppeting, as it's easier to ac
 - Previously there were multiple different automatic double puppeting methods like one with the help of the [Shared Secret Auth password provider module](./configuring-playbook-shared-secret-auth.md), but they have been superseded by this Appservice Double Puppet method. Double puppeting with the Shared Secret Auth works at the time of writing, but is deprecated and will stop working in the future as the older methods were completely removed in the megabridge rewrites on [the upstream project](https://docs.mau.fi/bridges/general/double-puppeting.html#automatically).
 
 <!-- TODO: remove this note if the Shared Secret Auth service has stopped working or the bridges have been removed -->
-- Some bridges like [the deprecated Facebook mautrix bridge](configuring-playbook-bridge-mautrix-facebook.md) and [matrix-appservice-kakaotalk](configuring-playbook-bridge-appservice-kakaotalk.md), which is partially based on the Facebook bridge, are compatible with the Shared Secret Auth service only. These bridges automatically perform Double Puppeting if [Shared Secret Auth](configuring-playbook-shared-secret-auth.md) service is configured and enabled on the server for this playbook.
+- Some bridges like [the deprecated Facebook mautrix bridge](configuring-playbook-bridge-mautrix-facebook.md) are compatible with the Shared Secret Auth service only. These bridges automatically perform Double Puppeting if [Shared Secret Auth](configuring-playbook-shared-secret-auth.md) service is configured and enabled on the server for this playbook.
 
 #### Method 2: manually, by asking each user to provide a working access token
 

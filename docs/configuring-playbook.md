@@ -146,6 +146,8 @@ Bridges can be used to connect your Matrix installation with third-party communi
 
 - [Setting up Mautrix Google Messages bridging](configuring-playbook-bridge-mautrix-gmessages.md)
 
+- [Setting up Mautrix Google Voice bridging](configuring-playbook-bridge-mautrix-gvoice.md)
+
 - [Setting up Mautrix Whatsapp bridging](configuring-playbook-bridge-mautrix-whatsapp.md)
 
 - [Setting up Instagram bridging via Mautrix Meta](configuring-playbook-bridge-mautrix-meta-instagram.md)
@@ -165,8 +167,6 @@ Bridges can be used to connect your Matrix installation with third-party communi
 - [Setting up Appservice IRC bridging](configuring-playbook-bridge-appservice-irc.md)
 
 - [Setting up Appservice Discord bridging](configuring-playbook-bridge-appservice-discord.md)
-
-- [Setting up Appservice Kakaotalk bridging](configuring-playbook-bridge-appservice-kakaotalk.md)
 
 - [Setting up Beeper LinkedIn bridging](configuring-playbook-bridge-beeper-linkedin.md)
 
@@ -262,6 +262,8 @@ Various services that don't fit any other categories.
 - [Configuring conduwuit](configuring-playbook-conduwuit.md) (removed; this component has been abandoned and unmaintained)
 
 - [Setting up the Sliding Sync proxy](configuring-playbook-sliding-sync-proxy.md) for clients which require Sliding Sync support (like old Element X versions, before it got switched to Simplified Sliding Sync)
+
+- [Setting up Appservice Kakaotalk bridging](configuring-playbook-bridge-appservice-kakaotalk.md) (removed; the upstream repository has become unreachable and the component could only be installed by self-building it)
 
 - [Setting up Appservice Slack bridging](configuring-playbook-bridge-appservice-slack.md) (removed; this component has been discontinued)
 
