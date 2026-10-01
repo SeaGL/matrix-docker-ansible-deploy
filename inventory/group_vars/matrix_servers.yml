@@ -8,28 +8,15 @@
 # If you've deployed using the wrong domain, you'll have to run the Uninstalling step,
 # because you can't change the Domain after deployment.
 matrix_domain: "{{ now(fmt='%Y') }}.seagl.org"
-matrix_static_files_file_index_html_enabled: false
-matrix_static_files_file_matrix_support_enabled: true
+
+# Enable serving a static site at the base domain.
 matrix_static_files_container_labels_base_domain_enabled: true
 matrix_static_files_container_labels_base_domain_root_path_redirection_url: https://seagl.org/attend
+matrix_static_files_file_index_html_enabled: false
+matrix_static_files_file_matrix_support_enabled: true
 
-matrix_server_fqn_matrix: "matrix.{{ now(fmt='%Y') }}.seagl.org"
-
-# Enable or disable this when the time is right
-matrix_synapse_enable_registration: false
-matrix_synapse_registration_requires_token: true
-
-# Raise rate limits for bursty usage patterns
-matrix_synapse_rc_invites:
-  per_room: {per_second: 1, burst_count: 100}
-  per_user: {per_second: 1, burst_count: 100}
-  per_issuer: {per_second: 1, burst_count: 100}
-matrix_synapse_rc_joins:
-  local: {per_second: 1, burst_count: 100}
-  remote: {per_second: 1, burst_count: 100}
-
+# Disable Element.
 matrix_client_element_enabled: false
-devture_playbook_state_preserver_vars_preservation_enabled: false
 
 # The Matrix homeserver software to install.
 # See:
@@ -44,20 +31,23 @@ matrix_homeserver_implementation: synapse
 # A secret used as a base, for generating various other secrets.
 # You can put any string here, but generating a strong one is preferred. You can create one with a command like `pwgen -s 64 1`.
 matrix_homeserver_generic_secret_key: !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          63373964623630633063383639346337343861303737623464343066653938623362366132323837
-          6634656132333834643561333562356261663136343933640a383135303838396234363261363066
-          37623065393230646533366336613165393261333737343264643138323163363564313062643765
-          3435643763633336630a366236383839346564363238613764376139333935313563306638393537
-          37363231643533643638623938383634383830306663343263363435323834303631613361366366
-          33653366356335373330303662393865313031373739353463663638336132383239646236366134
-          64623437643136656630623932333930626533633536616631643734366465643766303137313136
-          36323163383831626565
+  $ANSIBLE_VAULT;1.1;AES256
+  63373964623630633063383639346337343861303737623464343066653938623362366132323837
+  6634656132333834643561333562356261663136343933640a383135303838396234363261363066
+  37623065393230646533366336613165393261333737343264643138323163363564313062643765
+  3435643763633336630a366236383839346564363238613764376139333935313563306638393537
+  37363231643533643638623938383634383830306663343263363435323834303631613361366366
+  33653366356335373330303662393865313031373739353463663638336132383239646236366134
+  64623437643136656630623932333930626533633536616631643734366465643766303137313136
+  36323163383831626565
 
 # By default, the playbook manages its own Traefik (https://doc.traefik.io/traefik/) reverse-proxy server.
 # It will retrieve SSL certificates for you on-demand and forward requests to all other components.
 # For alternatives, see `docs/configuring-playbook-own-webserver.md`.
 matrix_playbook_reverse_proxy_type: playbook-managed-traefik
+
+# Disable preservation of vars on the server.
+devture_playbook_state_preserver_vars_preservation_enabled: false
 
 # Controls whether container networks will be created with IPv6 support.
 #
@@ -83,15 +73,15 @@ devture_systemd_docker_base_ipv6_enabled: false
 # Changing this value subsequently requires manual work.
 # The value used here must be shorter than 100 characters.
 postgres_connection_password: !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          32613637323734333961396332363534393634393861646161663831633934653232633435656661
-          3363663839336632343463643534356162653534323036300a393232393436393937626332613635
-          65633332303435383639353763636531343466313665626237626439386433623538623439623339
-          3837353761623536340a633733333830343237383730376137326230383166663564633330343061
-          63323134616463333830643565643133613037393163333266393538393035386635343032343831
-          62396538323061653936336135613631386563643136363831643939383732366538633632336366
-          31306531363038656136323563323738393231343039666630313233376265663931343532633762
-          65666362633031393261
+  $ANSIBLE_VAULT;1.1;AES256
+  32613637323734333961396332363534393634393861646161663831633934653232633435656661
+  3363663839336632343463643534356162653534323036300a393232393436393937626332613635
+  65633332303435383639353763636531343466313665626237626439386433623538623439623339
+  3837353761623536340a633733333830343237383730376137326230383166663564633330343061
+  63323134616463333830643565643133613037393163333266393538393035386635343032343831
+  62396538323061653936336135613631386563643136363831643939383732366538633632336366
+  31306531363038656136323563323738393231343039666630313233376265663931343532633762
+  65666362633031393261
 
 # By default, we configure coturn's external IP address using the value specified for `ansible_host` in your `inventory/hosts` file.
 # If this value is an external IP address, you can skip this section.
@@ -109,6 +99,19 @@ postgres_connection_password: !vault |
 #
 # matrix_coturn_turn_external_ip_address: ''
 
+# Enable or disable this when the time is right
+matrix_synapse_enable_registration: false
+matrix_synapse_registration_requires_token: true
+
+# Raise rate limits for bursty usage patterns
+matrix_synapse_rc_invites:
+  per_room: {per_second: 1, burst_count: 100}
+  per_user: {per_second: 1, burst_count: 100}
+  per_issuer: {per_second: 1, burst_count: 100}
+matrix_synapse_rc_joins:
+  local: {per_second: 1, burst_count: 100}
+  remote: {per_second: 1, burst_count: 100}
+
 # Audit user registrations
 matrix_synapse_ext_audit_registrations_enabled: true
 matrix_synapse_ext_audit_registrations_config:
@@ -119,16 +122,16 @@ matrix_synapse_ext_audit_registrations_config:
 prometheus_enabled: true
 prometheus_configuration_extension:
   remote_write:
-  - url: https://prometheus-prod-36-prod-us-west-0.grafana.net/api/prom/push
-    basic_auth:
-      username: !vault |
+    - url: https://prometheus-prod-36-prod-us-west-0.grafana.net/api/prom/push
+      basic_auth:
+        username: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           33653938653739643031346138363637643833633036353334323536633565386330376466363666
           6563653138373436346638626262393964373734326165620a303731383334393430633833663062
           33356534316565636163363237373564613234356533363134356263623136623132326135313639
           6434666530653231630a653461383539626563373031363064383234623930303836363066653632
           3663
-      password: !vault |
+        password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           34616363653131616161373833396638653837373036623039323966313230623333366134376631
           6539346631303631653731333033643834643166633735300a353565393939663232313132623839
