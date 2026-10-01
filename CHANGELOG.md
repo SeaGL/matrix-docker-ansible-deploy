@@ -1,4 +1,32 @@
+# 2026-07-15
+
+## Dedicated CAPTCHA variables for Matrix Authentication Service
+
+[Matrix Authentication Service](./docs/configuring-playbook-matrix-authentication-service.md) can now be protected with CAPTCHA (ReCaptcha v2, Cloudflare Turnstile, or hCaptcha) via dedicated variables, instead of going through `matrix_authentication_service_configuration_extension_yaml`. See the [captcha documentation](./docs/configuring-captcha.md#matrix-authentication-service) for details.
+
 # 2026-07-14
+
+## The playbook no longer ships a custom welcome page for Element Web
+
+Element Web [redesigned its welcome page](https://github.com/element-hq/element-web/pull/33211) (the screen shown at `/#/welcome` before logging in) into a built-in component and no longer loads a custom `welcome.html` file by default. Since the playbook upgraded to an Element Web version containing that change (spring 2026), the custom welcome page the playbook installed (and the variables customizing it) had silently stopped having any effect.
+
+The playbook now embraces the new upstream behavior and no longer ships its own `welcome.html`. The following variables have been removed and the playbook will let you know if you're still using them: `matrix_client_element_welcome_headline`, `matrix_client_element_welcome_text`, `matrix_client_element_welcome_logo_link` and `matrix_client_element_page_template_welcome_path`.
+
+Most welcome page customizations keep working, because they go through Element Web's branding configuration, which the new welcome page still honors:
+
+- a custom logo, via `matrix_client_element_welcome_logo` (or `matrix_client_element_branding_auth_header_logo_url`)
+- a custom background, via `matrix_client_element_branding_welcome_background_url`
+
+If you need a fully custom welcome page, you can self-host an HTML page and point Element Web at it, like this:
+
+```yaml
+matrix_client_element_configuration_extension_json: |
+  {
+    "embedded_pages": {
+      "welcome_url": "https://example.com/my-welcome.html"
+    }
+  }
+```
 
 ## BorgBackup now includes Synapse's local thumbnails
 
