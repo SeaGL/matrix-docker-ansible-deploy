@@ -1,8 +1,43 @@
-# 2026-07-23
+# 2026-07-28
+
+## (Backward Compatibility Break) ntfy users are now declared with hashed passwords
+
+This only affects you if you have enabled authentication for [ntfy](docs/configuring-playbook-ntfy.md) via `ntfy_credentials`.
+
+The ntfy role used to create users by invoking `ntfy user` commands against the running container. Since v2.14.0, ntfy can provision users and access-control entries from its own configuration file, so the role now does that instead. Besides being a lot simpler, this fixes passwords containing spaces never arriving intact.
+
+Replace `ntfy_credentials` with `ntfy_auth_users_custom`, which takes bcrypt password hashes rather than plaintext passwords:
+
+```yaml
+ntfy_auth_users_custom:
+  - username: alice
+    password_hash: $2a$10$YLiO8U21sX1uhZamTLJXHuxgVC0Z/GKISibrKCLohPgtG7yIxSk4C
+    role: admin
+```
+
+Generate a hash for each of your passwords by running the following command on any machine which has Docker installed. It asks for the password and prints its hash:
+
+```sh
+docker run --rm -it docker.io/binwiederhier/ntfy:latest user hash
+```
+
+The playbook will let you know if your configuration still uses `ntfy_credentials`.
+
+Your existing ntfy users are left alone and keep working until you declare them again this way. Note that ntfy manages declared users and access-control entries declaratively, so removing one from your configuration later deletes it from ntfy's user database.
+
+Users with the `admin` role get access to all topics. Others start with no access at all, and can be granted access to specific topics via `ntfy_auth_access_custom`. It is also now possible to control what unauthenticated visitors may do (`ntfy_auth_default_access`) and whether users may log in at all (`ntfy_enable_login`, which follows your authentication setup by default). See the role's [documentation on access control](https://github.com/mother-of-all-self-hosting/ansible-role-ntfy/blob/main/docs/configuring-ntfy.md#enable-access-control-with-authentication-optional) for details.
+
+## Support for bridging to LinkedIn via mautrix-linkedin
+
+Thanks to [Aine](https://gitlab.com/etke.cc) of [etke.cc](https://etke.cc/), the playbook now supports bridging to [LinkedIn](https://www.linkedin.com/) via [mautrix-linkedin](https://github.com/mautrix/linkedin).
+
+Logging in requires copying a request out of your browser's developer tools, and only works with Chrome or another Chrome-based browser. To learn more, see our [Setting up Mautrix LinkedIn bridging](./docs/configuring-playbook-bridge-mautrix-linkedin.md) documentation page.
+
+This bridge supersedes [beeper-linkedin](./docs/configuring-playbook-bridge-beeper-linkedin.md), which is now considered unmaintained (its [upstream repository](https://github.com/beeper/linkedin) has been archived). The old bridge remains installable, but you may wish to switch. Both bridges claim the same appservice namespaces, so the playbook refuses to install mautrix-linkedin while beeper-linkedin is still enabled.
 
 ## Support for bridging to LINE via beeper-line
 
-The playbook can now bridge [LINE](https://line.me/) via [beeper-line](https://github.com/beeper/line), a bridge based on the modern mautrix bridge framework. It supports LINE accounts with Letter Sealing enabled or disabled and bridges messages, media, reactions, replies, receipts, and other common chat features.
+Thanks to [Co van Leeuwen](https://github.com/c00), the playbook can now bridge [LINE](https://line.me/) via [beeper-line](https://github.com/beeper/line), a bridge based on the modern mautrix bridge framework. It supports LINE accounts with Letter Sealing enabled or disabled and bridges messages, media, reactions, replies, receipts, and other common chat features.
 
 The bridge identifies itself as a LINE Chrome Extension client, so it cannot be used at the same time as the real LINE Chrome Extension. See [Setting up Beeper LINE bridging](docs/configuring-playbook-bridge-beeper-line.md) to get started.
 
