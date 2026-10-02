@@ -102,7 +102,7 @@ postgres_connection_password: !vault |
 # matrix_synapse_limit_remote_rooms_admins_can_join: false
 
 # Enable or disable this when the time is right
-matrix_synapse_enable_registration: false
+matrix_synapse_enable_registration: true
 matrix_synapse_registration_requires_token: true
 
 # Raise rate limits for bursty usage patterns
