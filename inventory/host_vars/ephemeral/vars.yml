@@ -16,7 +16,7 @@ matrix_playbook_migration_validated_version: v2026.05.18.0
 
 # Enable serving a static site at the base domain.
 matrix_static_files_container_labels_base_domain_enabled: true
-matrix_static_files_container_labels_base_domain_root_path_redirection_url: https://seagl.org/attend
+matrix_static_files_container_labels_base_domain_root_path_redirection_enabled: false # Preview of attend.seagl.org
 matrix_static_files_file_index_html_enabled: false
 matrix_static_files_file_matrix_support_enabled: true
 
