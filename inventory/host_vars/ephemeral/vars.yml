@@ -20,6 +20,10 @@ matrix_static_files_container_labels_base_domain_root_path_redirection_url: http
 matrix_static_files_file_index_html_enabled: false
 matrix_static_files_file_matrix_support_enabled: true
 
+# Instruct Element to disable room encryption.
+matrix_static_files_file_matrix_client_property_io_element_e2ee_default: false
+matrix_static_files_file_matrix_client_property_io_element_e2ee_force_disable: true
+
 # Disable Element and serve a redirect.
 matrix_client_element_enabled: false
 matrix_playbook_public_client_root_redirection_url: https://seagl.org/attend
