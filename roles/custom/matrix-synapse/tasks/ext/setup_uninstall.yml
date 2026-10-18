@@ -55,10 +55,10 @@
     - when: not matrix_synapse_ext_synapse_s3_storage_provider_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/ext/s3-storage-provider/setup_uninstall.yml"
 
-# audit-registrations
+# audit
 - tags:
     - setup-all
     - setup-synapse
   block:
-    - when: not matrix_synapse_ext_audit_registrations_enabled | bool
-      ansible.builtin.include_tasks: "{{ role_path }}/tasks/ext/audit-registrations/setup_uninstall.yml"
+    - when: not matrix_synapse_ext_audit_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/ext/audit/setup_uninstall.yml"

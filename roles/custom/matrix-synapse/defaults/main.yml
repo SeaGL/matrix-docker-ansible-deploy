@@ -1847,8 +1847,8 @@ matrix_synapse_ext_synapse_s3_storage_provider_migrate_systemd_wanted_services_l
 # If it is, the Synapse media repo and media-repo workers will be disabled automatically.
 matrix_synapse_ext_media_repo_enabled: false
 
-# Auditing of user registrations
-matrix_synapse_ext_audit_registrations_enabled: false
+# Auditing of user activity
+matrix_synapse_ext_audit_enabled: false
 
 matrix_s3_media_store_enabled: false
 matrix_s3_media_store_custom_endpoint_enabled: false

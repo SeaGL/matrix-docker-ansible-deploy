@@ -114,9 +114,9 @@ matrix_synapse_rc_joins:
   local: {per_second: 1, burst_count: 100}
   remote: {per_second: 1, burst_count: 100}
 
-# Audit user registrations
-matrix_synapse_ext_audit_registrations_enabled: true
-matrix_synapse_ext_audit_registrations_config:
+# Audit user activity
+matrix_synapse_ext_audit_enabled: true
+matrix_synapse_ext_audit_config:
   room_alias: "#audit:{{ matrix_domain }}"
   user_id: "@notifications:{{ matrix_domain }}"
 
