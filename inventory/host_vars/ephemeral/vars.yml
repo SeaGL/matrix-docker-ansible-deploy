@@ -117,6 +117,7 @@ matrix_synapse_rc_joins:
 # Audit user activity
 matrix_synapse_ext_audit_enabled: true
 matrix_synapse_ext_audit_config:
+  internal_domains: [seattlematrix.org]
   room_alias: "#audit:{{ matrix_domain }}"
   user_id: "@notifications:{{ matrix_domain }}"
 
