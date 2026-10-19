@@ -38,6 +38,8 @@ jobs:
         run: pacman -S --noconfirm --needed just mise python
 
       - name: Run prek hooks
+        env:
+          SKIP: reuse
         run: |
           # The checkout action sets safe.directory using its own bundled
           # git, which is separate from the pacman-installed git that prek uses.
