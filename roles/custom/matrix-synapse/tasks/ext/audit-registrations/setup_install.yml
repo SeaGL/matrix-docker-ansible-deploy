@@ -5,7 +5,7 @@
     dest: "{{ matrix_synapse_ext_path }}/audit_registrations.py"
     owner: "{{ matrix_synapse_uid }}"
     group: "{{ matrix_synapse_gid }}"
-    mode: 0440
+    mode: "0440"
     content: |
       import logging
       from synapse.module_api.errors import SynapseError
