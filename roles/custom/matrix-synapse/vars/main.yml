@@ -9,7 +9,7 @@
 ---
 
 matrix_synapse_client_api_url_endpoint_public: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}://{{ matrix_server_fqn_matrix }}/_matrix/client/versions"
-matrix_synapse_federation_api_url_endpoint_public: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}://{{ matrix_server_fqn_matrix }}:{{ matrix_federation_public_port }}/_matrix/federation/v1/version"
+matrix_synapse_federation_api_url_endpoint_public: "{{ 'https' if matrix_playbook_ssl_enabled else 'http' }}://{{ matrix_server_fqn_matrix_federation }}:{{ matrix_federation_public_port }}/_matrix/federation/v1/version"
 
 matrix_synapse_media_store_directory_name: "{{ matrix_synapse_media_store_path | basename }}"
 
@@ -80,14 +80,17 @@ matrix_synapse_workers_federation_reader_federation_endpoints:
 # - some of these paths are auth-sensitive or deployment-sensitive, so we intentionally keep them out of the broad worker route model unless explicitly handled elsewhere
 #
 # Basically, we aim to cover most spec client APIs here. Skipping `/_synapse/client` is intentional and conservative.
-matrix_synapse_workers_generic_worker_client_server_endpoints: "{{ matrix_synapse_workers_generic_worker_endpoints | default([]) | map('regex_search', '.*/_matrix/client.*') | list | difference([none]) }}"
+# Here and in `matrix_synapse_workers_generic_worker_federation_endpoints` below, `reject('none')` is used instead of `difference([none])`.
+# `difference` returns the items in an order that changes between Ansible runs, which would rewrite the reverse-proxy companion configuration
+# (and restart its service) on every run.
+matrix_synapse_workers_generic_worker_client_server_endpoints: "{{ matrix_synapse_workers_generic_worker_endpoints | default([]) | map('regex_search', '.*/_matrix/client.*') | reject('none') | list }}"
 
 # A Synapse generic worker can handle both federation and client-server API endpoints.
 # We wish to split these, as we normally serve federation separately and don't want them mixed up.
 #
 # This is some ugly Ansible/Jinja2 hack (seen here: https://stackoverflow.com/a/47831492),
 # which takes a list of various strings and removes the ones NOT containing `/_matrix/federation` or `/_matrix/key` anywhere in them.
-matrix_synapse_workers_generic_worker_federation_endpoints: "{{ matrix_synapse_workers_generic_worker_endpoints | default([]) | map('regex_search', matrix_synapse_workers_generic_worker_federation_endpoints_regex) | list | difference([none]) }}"
+matrix_synapse_workers_generic_worker_federation_endpoints: "{{ matrix_synapse_workers_generic_worker_endpoints | default([]) | map('regex_search', matrix_synapse_workers_generic_worker_federation_endpoints_regex) | reject('none') | list }}"
 
 # matrix_synapse_workers_generic_worker_federation_endpoints_regex contains the regex used in matrix_synapse_workers_generic_worker_federation_endpoints.
 # It's intentionally put in a separate variable, to avoid tripping ansible-lint's jinja[spacing] rule.
@@ -165,6 +168,10 @@ matrix_synapse_workers_webserving_stream_writer_types: ['typing', 'to_device', '
 # This list is built during runtime.
 # Not all workers serve web requests. Those that don't won't be injected here.
 matrix_synapse_webserving_workers_systemd_services_list: []
+
+# Populated with systemd service definitions for workers (see `util/inject_worker.yml`) and wired into
+# `devture_systemd_service_manager_services_list_auto` via `group_vars/matrix_servers`.
+matrix_synapse_worker_systemd_services_list: []
 
 # matrix_synapse_known_worker_types contains the list of known worker types.
 #
