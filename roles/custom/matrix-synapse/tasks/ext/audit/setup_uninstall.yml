@@ -1,0 +1,6 @@
+---
+
+- name: Uninstall audit module
+  ansible.builtin.file:
+    path: "{{ matrix_synapse_ext_path }}/audit.py"
+    state: absent

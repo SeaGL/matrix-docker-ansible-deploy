@@ -1,0 +1,36 @@
+---
+
+- name: Install audit module
+  ansible.builtin.copy:
+    src: "{{ role_path }}/templates/synapse/ext/audit/audit.py"
+    dest: "{{ matrix_synapse_ext_path }}/audit.py"
+    owner: "{{ matrix_synapse_uid }}"
+    group: "{{ matrix_synapse_gid }}"
+    mode: "0440"
+
+- ansible.builtin.set_fact:
+    matrix_synapse_modules: |
+      {{
+        matrix_synapse_modules | default([])
+        +
+        [
+          {
+            "module": "audit.Audit",
+            "config": matrix_synapse_ext_audit_config
+          }
+        ]
+      }}
+
+    matrix_synapse_container_extra_arguments: >
+      {{
+        matrix_synapse_container_extra_arguments | default([])
+        +
+        ["--mount type=bind,src=" + matrix_synapse_ext_path + "/audit.py,dst=" + matrix_synapse_in_container_python_packages_path + "/audit.py,ro"]
+      }}
+
+    matrix_synapse_additional_loggers_auto: >
+      {{
+        matrix_synapse_additional_loggers_auto
+        +
+        [{'name': 'audit', 'level': 'INFO'}]
+      }}
